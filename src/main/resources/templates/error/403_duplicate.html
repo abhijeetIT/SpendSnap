@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Access Denied - Restricted Zone</title>
+</head>
+<body>
+<!-- Animated Stars Background -->
+<div class="stars-container">
+    <div class="stars stars-small"></div>
+    <div class="stars stars-medium"></div>
+    <div class="stars stars-large"></div>
+</div>
+
+<!-- Security Barriers -->
+<div class="security-barrier barrier-1"></div>
+<div class="security-barrier barrier-2"></div>
+<div class="security-barrier barrier-3"></div>
+
+<!-- Main Content -->
+<div class="error-container">
+    <!-- Security Robot Character -->
+    <div class="character">
+        <div class="security-robot">
+            <div class="robot-head">
+                <div class="robot-eyes">
+                    <div class="eye eye-left"></div>
+                    <div class="eye eye-right"></div>
+                </div>
+                <div class="robot-antenna"></div>
+            </div>
+            <div class="robot-body">
+                <div class="security-badge">🛡️</div>
+                <div class="warning-lights">
+                    <div class="warning-light"></div>
+                    <div class="warning-light"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Warning Message -->
+        <div class="warning-bubble">
+            <p>⚠️ RESTRICTED AREA ⚠️</p>
+        </div>
+    </div>
+
+    <!-- Error Content -->
+    <div class="error-content">
+        <div class="error-code">
+            <span class="error-number">4</span>
+            <div class="security-shield">🔐</div>
+            <span class="error-number">3</span>
+        </div>
+
+        <h1 class="error-title">ACCESS DENIED</h1>
+        <p class="error-subtitle">Security clearance required!</p>
+
+        <div class="error-message">
+            <p th:text="${message}">You don't have permission to access this area. Please contact your administrator for proper clearance.</p>
+        </div>
+
+        <div class="action-buttons">
+            <a th:href="@{/}" class="home-button">
+                <span class="button-icon">🏠</span>
+                Return to Base
+            </a>
+
+            <a th:href="@{/signin}" class="login-button">
+                <span class="button-icon">🔑</span>
+                Get Clearance
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: linear-gradient(135deg, #1a0000 0%, #330000 25%, #4d0000 50%, #660000 75%, #800000 100%);
+        min-height: 100vh;
+        overflow-x: hidden;
+        position: relative;
+        color: white;
+    }
+
+    /* Animated Stars Background */
+    .stars-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+    }
+
+    .stars {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-image:
+            radial-gradient(2px 2px at 20px 30px, rgba(255,100,100,0.8), transparent),
+            radial-gradient(2px 2px at 40px 70px, rgba(255,150,150,0.6), transparent),
+            radial-gradient(1px 1px at 90px 40px, rgba(255,200,200,0.9), transparent);
+        background-repeat: repeat;
+        background-size: 200px 100px;
+        animation: sparkle 4s linear infinite;
+    }
+
+    .stars-small { animation-duration: 4s; }
+    .stars-medium { animation-duration: 5s; animation-delay: -1s; }
+    .stars-large { animation-duration: 6s; animation-delay: -2s; }
+
+    /* Security Barriers */
+    .security-barrier {
+        position: absolute;
+        width: 100%;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, #ff0000, transparent);
+        animation: scanLine 3s ease-in-out infinite;
+        z-index: 2;
+    }
+
+    .barrier-1 { top: 20%; animation-delay: 0s; }
+    .barrier-2 { top: 50%; animation-delay: -1s; }
+    .barrier-3 { top: 80%; animation-delay: -2s; }
+
+    /* Main Container */
+    .error-container {
+        position: relative;
+        z-index: 10;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        text-align: center;
+    }
+
+    /* Security Robot Character */
+    .character {
+        position: relative;
+        margin-bottom: 40px;
+        animation: robotAlert 2s ease-in-out infinite;
+    }
+
+    .security-robot {
+        position: relative;
+        width: 120px;
+        height: 140px;
+    }
+
+    .robot-head {
+        width: 80px;
+        height: 60px;
+        background: linear-gradient(135deg, #ff4444, #cc0000);
+        border-radius: 15px;
+        position: relative;
+        margin: 0 auto 10px;
+        box-shadow: 0 0 20px rgba(255, 68, 68, 0.5);
+    }
+
+    .robot-eyes {
+        display: flex;
+        justify-content: space-between;
+        padding: 15px 15px 0;
+    }
+
+    .eye {
+        width: 12px;
+        height: 12px;
+        background: #fff;
+        border-radius: 50%;
+        animation: eyeGlow 1.5s ease-in-out infinite;
+    }
+
+    .robot-antenna {
+        position: absolute;
+        top: -15px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 3px;
+        height: 15px;
+        background: #ff4444;
+    }
+
+    .robot-antenna::after {
+        content: '';
+        position: absolute;
+        top: -5px;
+        left: -3px;
+        width: 9px;
+        height: 9px;
+        background: #ff0000;
+        border-radius: 50%;
+        animation: antennaFlash 1s ease-in-out infinite;
+    }
+
+    .robot-body {
+        width: 100px;
+        height: 70px;
+        background: linear-gradient(135deg, #666, #333);
+        border-radius: 10px;
+        margin: 0 auto;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .security-badge {
+        font-size: 24px;
+        margin-bottom: 10px;
+    }
+
+    .warning-lights {
+        display: flex;
+        gap: 10px;
+    }
+
+    .warning-light {
+        width: 8px;
+        height: 8px;
+        background: #ff0000;
+        border-radius: 50%;
+        animation: warningBlink 0.8s ease-in-out infinite alternate;
+    }
+
+    .warning-light:nth-child(2) {
+        animation-delay: -0.4s;
+    }
+
+    /* Warning Bubble */
+    .warning-bubble {
+        position: absolute;
+        top: -60px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(255, 0, 0, 0.9);
+        color: white;
+        padding: 10px 15px;
+        border-radius: 15px;
+        font-size: 12px;
+        font-weight: bold;
+        box-shadow: 0 5px 15px rgba(255, 0, 0, 0.3);
+        animation: warningPulse 2s ease-in-out infinite;
+    }
+
+    .warning-bubble::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 0;
+        border: 10px solid transparent;
+        border-top-color: rgba(255, 0, 0, 0.9);
+    }
+
+    /* Error Content */
+    .error-content {
+        max-width: 600px;
+        width: 100%;
+    }
+
+    .error-code {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .error-number {
+        font-size: 8rem;
+        font-weight: 900;
+        background: linear-gradient(135deg, #ff4444, #ff0000);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: 0 0 30px rgba(255, 68, 68, 0.5);
+        animation: numberAlert 1.5s ease-in-out infinite;
+    }
+
+    .security-shield {
+        font-size: 80px;
+        animation: shieldRotate 4s linear infinite;
+        filter: drop-shadow(0 0 20px rgba(255, 68, 68, 0.6));
+    }
+
+    .error-title {
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: 15px;
+        color: #ff4444;
+        text-shadow: 0 0 20px rgba(255, 68, 68, 0.5);
+        animation: titleFlash 2s ease-in-out infinite;
+    }
+
+    .error-subtitle {
+        font-size: 1.3rem;
+        color: #ffaaaa;
+        margin-bottom: 30px;
+        animation: subtitleGlow 3s ease-in-out infinite;
+    }
+
+    .error-message {
+        background: rgba(255, 68, 68, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 40px;
+        border: 2px solid rgba(255, 68, 68, 0.3);
+        font-size: 1.1rem;
+        line-height: 1.6;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .home-button, .login-button {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 15px 30px;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+    }
+
+    .home-button {
+        background: linear-gradient(135deg, #ff4444, #cc0000);
+        color: white;
+        box-shadow: 0 8px 25px rgba(255, 68, 68, 0.4);
+    }
+
+    .home-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 35px rgba(255, 68, 68, 0.6);
+    }
+
+    .login-button {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        border: 2px solid rgba(255, 68, 68, 0.5);
+    }
+
+    .login-button:hover {
+        background: rgba(255, 68, 68, 0.2);
+        transform: translateY(-3px);
+    }
+
+    /* Animations */
+    @keyframes sparkle {
+        from { transform: translateX(0); }
+        to { transform: translateX(-200px); }
+    }
+
+    @keyframes scanLine {
+        0%, 100% { opacity: 0; transform: scaleX(0); }
+        50% { opacity: 1; transform: scaleX(1); }
+    }
+
+    @keyframes robotAlert {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        25% { transform: translateY(-3px) rotate(-1deg); }
+        75% { transform: translateY(-3px) rotate(1deg); }
+    }
+
+    @keyframes eyeGlow {
+        0%, 100% { background: #fff; box-shadow: 0 0 5px #fff; }
+        50% { background: #ff0000; box-shadow: 0 0 10px #ff0000; }
+    }
+
+    @keyframes antennaFlash {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.3; }
+    }
+
+    @keyframes warningBlink {
+        0% { opacity: 1; }
+        100% { opacity: 0.3; }
+    }
+
+    @keyframes warningPulse {
+        0%, 100% { transform: translateX(-50%) scale(1); }
+        50% { transform: translateX(-50%) scale(1.05); }
+    }
+
+    @keyframes numberAlert {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+
+    @keyframes shieldRotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    @keyframes titleFlash {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.8; }
+    }
+
+    @keyframes subtitleGlow {
+        0%, 100% { text-shadow: 0 0 10px rgba(255, 170, 170, 0.5); }
+        50% { text-shadow: 0 0 20px rgba(255, 170, 170, 0.8); }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .error-number { font-size: 5rem; }
+        .error-title { font-size: 2rem; }
+        .action-buttons { flex-direction: column; align-items: center; }
+        .warning-bubble { display: none; }
+        .security-shield { font-size: 60px; }
+    }
+
+    @media (max-width: 480px) {
+        .error-number { font-size: 4rem; }
+        .error-title { font-size: 1.5rem; }
+        .security-robot { width: 80px; height: 100px; }
+        .robot-head { width: 60px; height: 45px; }
+        .robot-body { width: 70px; height: 50px; }
+    }
+</style>
+</body>
+</html>
