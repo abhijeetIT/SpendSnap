@@ -3,6 +3,7 @@ package com.spendsnap.Entities;
 import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "categories")
+@EntityListeners(AuditingEntityListener.class) // 👈 This e
 public class Category {
 
     @Id
@@ -20,10 +22,6 @@ public class Category {
     private String name;
 
     private String icon;
-
-    @ManyToOne
-    @JoinColumn(name = "user_email", nullable = false)
-    private User user;
 
     @CreatedDate
     @Column(updatable = false)
@@ -40,6 +38,11 @@ public class Category {
 
 
     public Category() {
+    }
+
+    public Category(String icon , String name) {
+        this.icon = icon;
+        this.name = name;
     }
 
     public String getName() {

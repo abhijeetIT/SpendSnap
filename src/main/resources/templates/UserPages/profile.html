@@ -1,0 +1,1583 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile | SpendSnap</title>
+    <link rel="icon" th:href="@{/images/spendsnap-logo1.png}" type="image/png">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3730a3;
+            --accent: #f72585;
+            --accent-dark: #e61473;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark);
+        }
+
+        /* Header Styles */
+        .header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            padding: 15px 0;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .logo-img {
+            height: 40px;
+            width: auto;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--gray-700);
+            font-weight: 500;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary);
+            background: rgba(67, 97, 238, 0.1);
+        }
+
+        .nav-link i {
+            margin-right: 8px;
+        }
+
+        /* User Profile in Nav */
+        .user-profile-nav {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease;
+            cursor: pointer;
+        }
+
+        .avatar-initials {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary);
+            color: white;
+            font-weight: bold;
+            font-size: 1.1em;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            cursor: pointer;
+        }
+
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--dark);
+            cursor: pointer;
+        }
+
+        /* Dashboard Layout */
+        .dashboard-container {
+            display: flex;
+            margin-top: 70px;
+            min-height: calc(100vh - 70px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: white;
+            border-right: 1px solid var(--gray-200);
+            padding: 20px;
+            position: fixed;
+            height: calc(100vh - 70px);
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-menu {
+            margin-top: 30px;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            margin-bottom: 5px;
+            border-radius: 8px;
+            color: var(--gray-700);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-item:hover, .sidebar-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .sidebar-item i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            margin-left: 250px;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            color: var(--dark);
+        }
+
+        /* Modern Profile Layout */
+        .profile-container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 30px;
+        }
+
+        .profile-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            height: fit-content;
+        }
+
+        .profile-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary);
+            color: white;
+            font-size: 2.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            border: 3px solid white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .profile-avatar:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .profile-avatar .camera-overlay {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid white;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .profile-avatar:hover .camera-overlay {
+            background: var(--primary-dark);
+            transform: scale(1.1);
+        }
+
+        .profile-name {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .profile-email {
+            color: var(--gray-600);
+            font-size: 0.95rem;
+        }
+
+        .profile-stats {
+            margin-top: 30px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .stat-label {
+            color: var(--gray-600);
+            font-size: 0.9rem;
+        }
+
+        .stat-value {
+            font-weight: 600;
+        }
+
+        /* Profile Content */
+        .profile-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .profile-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--gray-200);
+            margin-bottom: 25px;
+        }
+
+        .tab-btn {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            color: var(--gray-600);
+            font-weight: 500;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--gray-700);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--gray-300);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+
+        .form-input.changed {
+            border-color: var(--warning);
+            background-color: rgba(245, 158, 11, 0.05);
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--gray-300);
+            border-radius: 8px;
+            font-size: 1rem;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+
+        /* Edit Icon */
+        .edit-icon {
+            position: absolute;
+            top: 35px;
+            right: 10px;
+            color: var(--gray-400);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            opacity: 0;
+        }
+
+        .form-group:hover .edit-icon {
+            opacity: 1;
+        }
+
+        .edit-icon:hover {
+            color: var(--primary);
+            transform: scale(1.1);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--primary-dark);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--gray-300);
+            color: var(--gray-700);
+        }
+
+        .btn-outline:hover {
+            background: var(--gray-100);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        /* Changes Notice */
+        .changes-notice {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            color: #92400e;
+        }
+
+        .changes-notice.show {
+            display: flex;
+        }
+
+        /* Danger Zone */
+        .danger-zone {
+            background: rgba(239, 68, 68, 0.05);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 40px;
+        }
+
+        .danger-zone-title {
+            color: var(--danger);
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .danger-zone-description {
+            color: var(--gray-600);
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+
+        /* Alert Styles */
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            position: relative;
+            animation: slideIn 0.3s ease;
+        }
+
+        .alert-success {
+            background-color: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: #065f46;
+        }
+
+        .alert-danger {
+            background-color: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #991b1b;
+        }
+
+        .alert-warning {
+            background-color: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            color: #92400e;
+        }
+
+        .alert-info {
+            background-color: rgba(67, 97, 238, 0.1);
+            border: 1px solid rgba(67, 97, 238, 0.2);
+            color: #1e40af;
+        }
+
+        .alert i {
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+
+        .alert-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: inherit;
+            opacity: 0.7;
+        }
+
+        .alert-close:hover {
+            opacity: 1;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Error Messages */
+        .error-message {
+            color: var(--danger);
+            font-size: 0.85rem;
+            margin-top: 5px;
+            display: block;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .modal-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray-600);
+            padding: 5px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--gray-100);
+            color: var(--dark);
+        }
+
+        /* Profile Picture Modal */
+        .profile-pic-options {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .option-btn {
+            flex: 1;
+            padding: 20px;
+            border: 2px solid var(--gray-200);
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary);
+            background: rgba(67, 97, 238, 0.05);
+        }
+
+        .option-btn i {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .option-btn h3 {
+            margin-bottom: 5px;
+            color: var(--dark);
+        }
+
+        .option-btn p {
+            color: var(--gray-600);
+            font-size: 0.9rem;
+        }
+
+        /* File Upload */
+        .file-upload-area {
+            border: 2px dashed var(--gray-300);
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin: 20px 0;
+        }
+
+        .file-upload-area:hover {
+            border-color: var(--primary);
+            background: rgba(67, 97, 238, 0.05);
+        }
+
+        .file-upload-area.dragover {
+            border-color: var(--primary);
+            background: rgba(67, 97, 238, 0.1);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: var(--gray-400);
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            color: var(--gray-600);
+            margin-bottom: 10px;
+        }
+
+        .upload-hint {
+            color: var(--gray-500);
+            font-size: 0.85rem;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        /* Image Preview */
+        .image-preview {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .preview-img {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        /* Full Screen Image Viewer */
+        .image-viewer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 3000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .image-viewer.active {
+            display: flex;
+        }
+
+        .image-viewer img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+        }
+
+        .image-viewer .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            font-size: 2rem;
+            padding: 10px 15px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .image-viewer .close-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+                z-index: 900;
+            }
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .mobile-menu-toggle {
+                display: block;
+            }
+            .nav-menu {
+                display: none;
+            }
+            .profile-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 20px;
+            }
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            .profile-tabs {
+                overflow-x: auto;
+                padding-bottom: 5px;
+            }
+            .profile-card, .profile-content {
+                padding: 20px;
+            }
+            .profile-pic-options {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .profile-avatar {
+                width: 80px;
+                height: 80px;
+                font-size: 2rem;
+            }
+            .form-actions {
+                flex-direction: column;
+            }
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            .modal-content {
+                margin: 20px;
+                width: calc(100% - 40px);
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Header -->
+<header class="header">
+    <div class="nav-container">
+        <a th:href="@{/user/dashboard}" class="nav-logo">
+            <img th:src="@{/images/spendsnap-logo.png}" alt="SpendSnap" class="logo-img">
+        </a>
+
+        <button class="mobile-menu-toggle">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <nav class="nav-menu">
+            <a th:href="@{/user/dashboard}" class="nav-link">
+                <i class="fas fa-home"></i> Dashboard
+            </a>
+            <a th:href="@{/user/transactions}" class="nav-link">
+                <i class="fas fa-exchange-alt"></i> Transactions
+            </a>
+            <a th:href="@{/user/categories}" class="nav-link">
+                <i class="fas fa-tags"></i> Categories
+            </a>
+        </nav>
+
+        <div class="user-profile-nav">
+            <!-- Profile Picture -->
+            <a th:href="@{/user/profile}">
+                <img th:if="${user != null and user.profilePictureUrl != null and !user.profilePictureUrl.isEmpty()}"
+                     th:src="${user.profilePictureUrl}"
+                     alt="User Avatar"
+                     class="avatar-img">
+
+                <!-- User Initials -->
+                <div th:if="${user != null and (user.profilePictureUrl == null or user.profilePictureUrl.isEmpty())}"
+                     class="avatar-initials"
+                     th:text="${user.name != null ? #strings.toUpperCase(#strings.substring(user.name, 0, 1)) : '?'}">
+                </div>
+
+                <!-- Fallback -->
+                <div th:unless="${user != null}"
+                     class="avatar-initials">?
+                </div>
+            </a>
+        </div>
+    </div>
+</header>
+
+<!-- Dashboard Layout -->
+<div class="dashboard-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-menu">
+            <a th:href="@{/user/dashboard}" class="sidebar-item">
+                <i class="fas fa-home"></i> Dashboard
+            </a>
+            <a th:href="@{/user/transactions}" class="sidebar-item">
+                <i class="fas fa-exchange-alt"></i> Transactions
+            </a>
+            <a th:href="@{/user/categories}" class="sidebar-item">
+                <i class="fas fa-tags"></i> Categories
+            </a>
+            <a th:href="@{/user/profile}" class="sidebar-item active">
+                <i class="fas fa-user"></i> Profile
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <h1 class="page-title">Profile Settings</h1>
+
+        <!-- Alert Messages Container -->
+        <div id="alertContainer"></div>
+
+        <!-- Alert Messages -->
+        <div th:if="${successMessage}" class="alert alert-success">
+            <i class="fas fa-check-circle"></i>
+            <span th:text="${successMessage}"></span>
+            <button class="alert-close" onclick="this.parentElement.remove()">&times;</button>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger">
+            <i class="fas fa-exclamation-circle"></i>
+            <span th:text="${errorMessage}"></span>
+            <button class="alert-close" onclick="this.parentElement.remove()">&times;</button>
+        </div>
+
+        <div class="profile-container">
+            <!-- Profile Card -->
+            <div class="profile-card">
+                <div class="profile-header">
+                    <div class="profile-avatar" onclick="showProfilePicOptions()">
+                        <img th:if="${user != null and user.profilePictureUrl != null and !user.profilePictureUrl.isEmpty()}"
+                             th:src="${user.profilePictureUrl}"
+                             alt="Profile Picture"
+                             id="profileImage">
+
+                        <span th:if="${user != null and (user.profilePictureUrl == null or user.profilePictureUrl.isEmpty())}"
+                              th:text="${user.name != null ? #strings.toUpperCase(#strings.substring(user.name, 0, 1)) + (#strings.substring(user.name, user.name.indexOf(' ') + 1, user.name.indexOf(' ') + 2) != null ? #strings.toUpperCase(#strings.substring(user.name, user.name.indexOf(' ') + 1, user.name.indexOf(' ') + 2)) : '') : '?'}"
+                              id="profileInitials">
+                        </span>
+
+                        <div class="camera-overlay">
+                            <i class="fas fa-camera"></i>
+                        </div>
+                    </div>
+                    <h3 class="profile-name" th:text="${user.name}">User Name</h3>
+                    <p class="profile-email" th:text="${user.email}">user@example.com</p>
+                </div>
+
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Member Since</span>
+                        <span class="stat-value" th:text="${user.createdAt != null ? #temporals.format(user.createdAt, 'MMM yyyy') : 'N/A'}">Jan 2023</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Total Transactions</span>
+                        <span class="stat-value" th:text="${totalTransactions}">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Content -->
+            <div class="profile-content">
+                <div class="profile-tabs">
+                    <button class="tab-btn active" data-tab="personal">Personal Info</button>
+                    <button class="tab-btn" data-tab="security">Security</button>
+                </div>
+
+                <!-- Personal Info Tab -->
+                <div class="tab-content active" id="personal">
+                    <!-- Changes Notice -->
+                    <div class="changes-notice" id="changesNotice">
+                        <i class="fas fa-info-circle"></i>
+                        <span>You have unsaved changes. Click "Save Changes" to update your profile.</span>
+                    </div>
+
+                    <form th:action="@{/user/profile/update}" method="post" th:object="${user}" id="profileForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="name">Full Name</label>
+                                <input type="text" id="name" class="form-input" th:field="*{name}" required>
+                                <i class="fas fa-edit edit-icon" title="Click to edit"></i>
+                                <span id="nameError" class="error-message"></span>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="email">Email</label>
+                                <input type="email" id="email" class="form-input" th:field="*{email}" required>
+                                <i class="fas fa-edit edit-icon" title="Click to edit"></i>
+                                <span id="emailError" class="error-message"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="phone">Phone</label>
+                                <input type="tel" id="phone" class="form-input" th:field="*{phoneNumber}" maxlength="10">
+                                <i class="fas fa-edit edit-icon" title="Click to edit"></i>
+                                <span id="phoneError" class="error-message"></span>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="dob">Date of Birth</label>
+                                <input type="date" id="dob" class="form-input" name="dateOfBirth"
+                                       th:value="${user.dateOfBirth != null} ? ${#temporals.format(user.dateOfBirth, 'yyyy-MM-dd')} : ''">
+                                <i class="fas fa-edit edit-icon" title="Click to edit"></i>
+                                <span id="dobError" class="error-message"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary" id="saveBtn" disabled>
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
+                            <button type="button" class="btn btn-outline" id="cancelBtn" onclick="resetForm()" disabled>
+                                <i class="fas fa-times"></i> Cancel Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Security Tab -->
+                <div class="tab-content" id="security">
+                    <form th:action="@{/user/profile/change-password}" method="post" id="passwordForm">
+                        <div class="form-group">
+                            <label class="form-label" for="currentPassword">Current Password</label>
+                            <input type="password" id="currentPassword" name="currentPassword" class="form-input" required>
+                            <span id="currentPasswordError" class="error-message"></span>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="newPassword">New Password</label>
+                                <input type="text" id="newPassword" name="newPassword" class="form-input" required minlength="8">
+                                <span id="newPasswordError" class="error-message"></span>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="confirmPassword">Confirm Password</label>
+                                <input type="password" id="confirmPassword" name="confirmPassword" class="form-input" required>
+                                <span id="confirmPasswordError" class="error-message"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-key"></i> Update Password
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="danger-zone">
+                        <h3 class="danger-zone-title">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Danger Zone
+                        </h3>
+                        <p class="danger-zone-description">
+                            Deleting your account will remove all your data permanently.
+                        </p>
+                        <button type="button" class="btn btn-danger" onclick="confirmDelete()">
+                            <i class="fas fa-trash"></i> Delete Account
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Profile Picture Options Modal -->
+<div id="profilePicModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Profile Picture</h2>
+            <button class="modal-close" onclick="closeModal('profilePicModal')">&times;</button>
+        </div>
+
+        <div class="profile-pic-options">
+            <div class="option-btn" onclick="viewProfilePicture()">
+                <i class="fas fa-eye"></i>
+                <h3>View Picture</h3>
+                <p>See your current profile picture</p>
+            </div>
+            <div class="option-btn" onclick="editProfilePicture()">
+                <i class="fas fa-camera"></i>
+                <h3>Edit Picture</h3>
+                <p>Upload a new profile picture</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Profile Picture Modal -->
+<div id="editPicModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Update Profile Picture</h2>
+            <button class="modal-close" onclick="closeModal('editPicModal')">&times;</button>
+        </div>
+
+        <form id="profilePicForm" th:action="@{/user/profile/update-picture}" method="post" enctype="multipart/form-data">
+            <div class="file-upload-area" onclick="document.getElementById('fileInput').click()">
+                <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                <p class="upload-text">Click to upload or drag and drop</p>
+                <p class="upload-hint">JPG, PNG or GIF (max 5MB)</p>
+            </div>
+
+            <input type="file" id="fileInput" name="profilePicture" accept="image/*">
+
+            <div class="image-preview" id="imagePreview" style="display: none;">
+                <img id="previewImg" class="preview-img" alt="Preview">
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary" id="uploadBtn" disabled>
+                    <i class="fas fa-upload"></i> Upload Picture
+                </button>
+                <button type="button" class="btn btn-outline" onclick="closeModal('editPicModal')">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Full Screen Image Viewer -->
+<div id="imageViewer" class="image-viewer">
+    <button class="close-btn" onclick="closeImageViewer()">&times;</button>
+    <img id="fullScreenImg" alt="Profile Picture">
+</div>
+
+<script>
+    // Store original form values for change detection
+    let originalValues = {};
+    let hasChanges = false;
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeForm();
+        setupEventListeners();
+        setupDateValidation();
+    });
+
+    function initializeForm() {
+        // Store original values
+        const form = document.getElementById('profileForm');
+        const formData = new FormData(form);
+        for (let [key, value] of formData.entries()) {
+            originalValues[key] = value;
+        }
+
+        // Also store individual field values
+        originalValues.name = document.getElementById('name').value;
+        originalValues.email = document.getElementById('email').value;
+        originalValues.phone = document.getElementById('phone').value;
+        originalValues.dob = document.getElementById('dob').value;
+    }
+
+    function setupEventListeners() {
+        // Mobile menu toggle
+        document.querySelector('.mobile-menu-toggle').addEventListener('click', function() {
+            document.querySelector('.sidebar').classList.toggle('active');
+        });
+
+        // Tab functionality
+        document.querySelectorAll('.tab-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const tabName = this.getAttribute('data-tab');
+
+                // Remove active class from all tabs and content
+                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+                // Add active class to clicked tab and corresponding content
+                this.classList.add('active');
+                document.getElementById(tabName).classList.add('active');
+            });
+        });
+
+        // Form change detection
+        const formInputs = ['name', 'email', 'phone', 'dob'];
+        formInputs.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('input', checkForChanges);
+                element.addEventListener('change', checkForChanges);
+            }
+        });
+
+        // Phone number formatting
+        document.getElementById('phone')?.addEventListener('input', function() {
+            this.value = this.value.replace(/\D/g, '').substring(0, 10);
+        });
+
+        // File upload handling
+        setupFileUpload();
+    }
+
+    function setupDateValidation() {
+        const today = new Date();
+        const minDate = new Date();
+        minDate.setFullYear(today.getFullYear() - 120);
+
+        const maxDate = new Date();
+        maxDate.setFullYear(today.getFullYear() - 14);
+
+        const dobInput = document.getElementById('dob');
+        if (dobInput) {
+            dobInput.max = maxDate.toISOString().split('T')[0];
+            dobInput.min = minDate.toISOString().split('T')[0];
+        }
+    }
+
+    function checkForChanges() {
+        const currentValues = {
+            name: document.getElementById('name').value,
+            email: document.getElementById('email').value,
+            phone: document.getElementById('phone').value,
+            dob: document.getElementById('dob').value
+        };
+
+        hasChanges = false;
+
+        // Check each field for changes
+        Object.keys(currentValues).forEach(key => {
+            const element = document.getElementById(key);
+            if (currentValues[key] !== originalValues[key]) {
+                hasChanges = true;
+                element.classList.add('changed');
+            } else {
+                element.classList.remove('changed');
+            }
+        });
+
+        // Update UI based on changes
+        updateChangeUI();
+    }
+
+    function updateChangeUI() {
+        const saveBtn = document.getElementById('saveBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const changesNotice = document.getElementById('changesNotice');
+
+        if (hasChanges) {
+            saveBtn.disabled = false;
+            cancelBtn.disabled = false;
+            changesNotice.classList.add('show');
+        } else {
+            saveBtn.disabled = true;
+            cancelBtn.disabled = true;
+            changesNotice.classList.remove('show');
+        }
+    }
+
+    function resetForm() {
+        // Reset all form values to original
+        document.getElementById('name').value = originalValues.name || '';
+        document.getElementById('email').value = originalValues.email || '';
+        document.getElementById('phone').value = originalValues.phone || '';
+        document.getElementById('dob').value = originalValues.dob || '';
+
+        // Clear all change indicators
+        document.querySelectorAll('.form-input').forEach(input => {
+            input.classList.remove('changed');
+        });
+
+        // Clear error messages
+        document.querySelectorAll('.error-message').forEach(error => {
+            error.textContent = '';
+        });
+
+        // Update UI
+        hasChanges = false;
+        updateChangeUI();
+
+        showAlert('info', 'Changes have been reset to original values.', 3000);
+    }
+
+    // Profile Picture Functions
+    function showProfilePicOptions() {
+        document.getElementById('profilePicModal').classList.add('active');
+    }
+
+    function viewProfilePicture() {
+        const profileImg = document.getElementById('profileImage');
+        if (profileImg && profileImg.src) {
+            document.getElementById('fullScreenImg').src = profileImg.src;
+            document.getElementById('imageViewer').classList.add('active');
+            closeModal('profilePicModal');
+        } else {
+            showAlert('info', 'No profile picture uploaded yet.', 3000);
+        }
+    }
+
+    function editProfilePicture() {
+        closeModal('profilePicModal');
+        document.getElementById('editPicModal').classList.add('active');
+    }
+
+    function closeModal(modalId) {
+        document.getElementById(modalId).classList.remove('active');
+    }
+
+    function closeImageViewer() {
+        document.getElementById('imageViewer').classList.remove('active');
+    }
+
+    function setupFileUpload() {
+        const fileInput = document.getElementById('fileInput');
+        const uploadArea = document.querySelector('.file-upload-area');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const imagePreview = document.getElementById('imagePreview');
+        const previewImg = document.getElementById('previewImg');
+
+        // File input change
+        fileInput.addEventListener('change', handleFileSelect);
+
+        // Drag and drop
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            this.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                handleFileSelect();
+            }
+        });
+
+        function handleFileSelect() {
+            const file = fileInput.files[0];
+            if (file) {
+                // Validate file
+                if (!file.type.startsWith('image/')) {
+                    showAlert('danger', 'Please select a valid image file.', 5000);
+                    return;
+                }
+
+                if (file.size > 5 * 1024 * 1024) { // 5MB
+                    showAlert('danger', 'File size must be less than 5MB.', 5000);
+                    return;
+                }
+
+                // Show preview
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    imagePreview.style.display = 'block';
+                    uploadBtn.disabled = false;
+                };
+                reader.readAsDataURL(file);
+
+                showAlert('success', 'Image selected successfully!', 3000);
+            }
+        }
+    }
+
+    // Form Validation
+    document.getElementById('profileForm')?.addEventListener('submit', function(e) {
+        if (!validateProfileForm()) {
+            e.preventDefault();
+        }
+    });
+
+    document.getElementById('passwordForm')?.addEventListener('submit', function(e) {
+        if (!validatePasswordForm()) {
+            e.preventDefault();
+        }
+    });
+
+    document.getElementById('profilePicForm')?.addEventListener('submit', function(e) {
+        const submitBtn = this.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+    });
+
+    function validateProfileForm() {
+        let isValid = true;
+
+        // Clear previous errors
+        document.querySelectorAll('#profileForm .error-message').forEach(el => el.textContent = '');
+
+        // Name validation
+        const name = document.getElementById('name').value.trim();
+        if (!name) {
+            document.getElementById('nameError').textContent = 'Name is required';
+            isValid = false;
+        }
+
+        // Email validation
+        const email = document.getElementById('email').value.trim();
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email) {
+            document.getElementById('emailError').textContent = 'Email is required';
+            isValid = false;
+        } else if (!emailRegex.test(email)) {
+            document.getElementById('emailError').textContent = 'Please enter a valid email address';
+            isValid = false;
+        }
+
+        // Phone validation
+        const phone = document.getElementById('phone').value.trim();
+        if (phone && !/^\d{10}$/.test(phone)) {
+            document.getElementById('phoneError').textContent = 'Phone number must be 10 digits';
+            isValid = false;
+        }
+
+        // DOB validation
+        const dob = document.getElementById('dob').value;
+        if (dob) {
+            const dobDate = new Date(dob);
+            const today = new Date();
+            const minDobDate = new Date();
+            minDobDate.setFullYear(today.getFullYear() - 14);
+
+            if (dobDate > minDobDate) {
+                document.getElementById('dobError').textContent = 'You must be at least 14 years old';
+                isValid = false;
+            }
+        }
+
+        if (!isValid) {
+            showAlert('danger', 'Please correct the errors in the form.', 5000);
+        }
+
+        return isValid;
+    }
+
+    function validatePasswordForm() {
+        let isValid = true;
+
+        // Clear previous errors
+        document.querySelectorAll('#passwordForm .error-message').forEach(el => el.textContent = '');
+
+        const currentPassword = document.getElementById('currentPassword').value.trim();
+        const newPassword = document.getElementById('newPassword').value.trim();
+        const confirmPassword = document.getElementById('confirmPassword').value.trim();
+
+        if (!currentPassword) {
+            document.getElementById('currentPasswordError').textContent = 'Current password is required';
+            isValid = false;
+        }
+
+        if (!newPassword) {
+            document.getElementById('newPasswordError').textContent = 'New password is required';
+            isValid = false;
+        } else if (newPassword.length < 8) {
+            document.getElementById('newPasswordError').textContent = 'Password must be at least 8 characters';
+            isValid = false;
+        }
+
+        if (!confirmPassword) {
+            document.getElementById('confirmPasswordError').textContent = 'Please confirm your password';
+            isValid = false;
+        } else if (newPassword !== confirmPassword) {
+            document.getElementById('confirmPasswordError').textContent = 'Passwords do not match';
+            isValid = false;
+        }
+
+        if (!isValid) {
+            showAlert('danger', 'Please correct the errors in the form.', 5000);
+        }
+
+        return isValid;
+    }
+
+    // Alert System
+    function showAlert(type, message, duration = 5000) {
+        const alertContainer = document.getElementById('alertContainer');
+
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type}`;
+
+        const icon = type === 'success' ? 'check-circle' :
+                    type === 'danger' ? 'exclamation-circle' :
+                    type === 'warning' ? 'exclamation-triangle' : 'info-circle';
+
+        alertDiv.innerHTML = `
+            <i class="fas fa-${icon}"></i>
+            <span>${message}</span>
+            <button class="alert-close" onclick="this.parentElement.remove()">&times;</button>
+        `;
+
+        alertContainer.appendChild(alertDiv);
+
+        // Auto-hide after duration
+        if (duration > 0) {
+            setTimeout(() => {
+                if (alertDiv.parentElement) {
+                    alertDiv.style.opacity = '0';
+                    alertDiv.style.transform = 'translateX(100%)';
+                    setTimeout(() => alertDiv.remove(), 300);
+                }
+            }, duration);
+        }
+    }
+
+    // Account deletion
+    function confirmDelete() {
+        if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+            if (confirm('This will permanently delete all your data. Are you absolutely sure?')) {
+                window.location.href = '/user/profile/delete';
+            }
+        }
+    }
+
+    // Close modals when clicking outside
+    window.addEventListener('click', function(e) {
+        const modals = document.querySelectorAll('.modal');
+        modals.forEach(modal => {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+            }
+        });
+    });
+
+    // Close image viewer with escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeImageViewer();
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.classList.remove('active');
+            });
+        }
+    });
+
+    // Auto-hide existing server alerts
+    setTimeout(function() {
+        const existingAlerts = document.querySelectorAll('.alert:not(#alertContainer .alert)');
+        existingAlerts.forEach(alert => {
+            if (!alert.querySelector('.alert-close')) {
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 500);
+            }
+        });
+    }, 5000);
+
+    // Show welcome message for new profiles
+    window.addEventListener('load', function() {
+        const hasProfilePic = document.getElementById('profileImage');
+        if (!hasProfilePic) {
+            setTimeout(() => {
+                showAlert('info', 'Welcome! Click on your profile picture to upload a photo.', 8000);
+            }, 1000);
+        }
+    });
+</script>
+</body>
+</html>

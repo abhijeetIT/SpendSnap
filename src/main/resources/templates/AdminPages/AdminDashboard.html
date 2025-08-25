@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin Panel • SpendSnap</title>
+    <link rel="icon" th:href="@{/images/spendsnap-logo1.png}" type="image/png">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- CSRF Meta Tags -->
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <style>
+        :root {
+          --bg: #0f172a;
+          --panel: #111827;
+          --muted: #94a3b8;
+          --text: #e5e7eb;
+          --accent: #22c55e;
+          --accent-2: #3b82f6;
+          --danger: #ef4444;
+          --warn: #f59e0b;
+          --card: #0b1220;
+          --ring: rgba(59,130,246,0.35);
+          --shadow: 0 10px 25px rgba(0,0,0,.35), 0 2px 6px rgba(0,0,0,.35);
+          --radius: 16px;
+        }
+        * { box-sizing: border-box; }
+        html, body { height: 100%; }
+        body {
+          margin: 0; background: radial-gradient(1200px 800px at 15% 10%, #111827 0%, #0b1220 30%, var(--bg) 65%);
+          color: var(--text); font: 500 15px/1.5 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+        }
+        .container { max-width: 1200px; margin: 32px auto; padding: 0 16px 80px; }
+
+        /* Header */
+        .header {
+          display: flex; align-items: center; justify-content: space-between; gap: 12px;
+          padding: 18px 20px; background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+          border: 1px solid rgba(255,255,255,.06); border-radius: var(--radius); box-shadow: var(--shadow);
+          backdrop-filter: blur(6px);
+        }
+        .brand { display: flex; align-items: center; gap: 12px; }
+        .brand .logo { width: 40px; height: 40px; border-radius: 10px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        .brand .logo img { width: 100%; height: 100%; object-fit: contain; }
+        .brand h1 { font-size: 20px; margin: 0; font-weight: 800; letter-spacing: .4px; }
+        .header .right { display: flex; align-items: center; gap: 10px; }
+        .pill { padding: 6px 10px; border-radius: 999px; border: 1px solid rgba(255,255,255,.08); background: rgba(148,163,184,.08); color: var(--text); font-weight: 600; }
+
+        /* Navigation */
+        .nav {
+          display: flex; gap: 8px; margin: 16px 0; flex-wrap: wrap;
+        }
+        .nav-item {
+          padding: 10px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,.08);
+          background: rgba(255,255,255,.04); color: var(--text); text-decoration: none;
+          font-weight: 600; display: flex; align-items: center; gap: 8px; transition: all 0.2s;
+        }
+        .nav-item:hover { background: rgba(255,255,255,.08); }
+        .nav-item.active {
+          background: linear-gradient(135deg, #2563eb, #22c55e);
+          box-shadow: 0 0 0 3px var(--ring);
+        }
+
+        /* Grid */
+        .grid { display: grid; gap: 18px; margin-top: 18px; }
+        @media (min-width: 900px) {
+          .grid-3 { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        /* Cards */
+        .card {
+          background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+          border: 1px solid rgba(255,255,255,.06); border-radius: var(--radius); box-shadow: var(--shadow);
+          padding: 18px; position: relative;
+        }
+        .card h2 { margin: 0 0 12px; font-size: 16px; font-weight: 800; letter-spacing: .3px; opacity: .95; }
+        .card .sub { color: var(--muted); font-size: 13px; margin-top: -4px; margin-bottom: 10px; }
+
+        /* Stat cards */
+        .stat { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-radius: 12px; background: #0b1424; border: 1px dashed rgba(255,255,255,.08); }
+        .stat .label { color: var(--muted); font-size: 13px; }
+        .stat .value { font-size: 22px; font-weight: 900; letter-spacing: .3px; }
+
+        /* Table */
+        .table { width: 100%; border-collapse: collapse; }
+        .table th, .table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,.06); vertical-align: middle; }
+        .table th { font-size: 12px; text-transform: uppercase; letter-spacing: .8px; color: var(--muted); }
+        .table tr:hover td { background: rgba(255,255,255,.02); }
+
+        .badge { padding: 6px 10px; border-radius: 999px; font-size: 12px; font-weight: 800; letter-spacing: .3px; border: 1px solid rgba(255,255,255,.08); }
+        .badge.success { background: rgba(34,197,94,.15); color: #86efac; }
+        .badge.danger { background: rgba(239,68,68,.15); color: #fecaca; }
+        .badge.info { background: rgba(59,130,246,.15); color: #bfdbfe; }
+        .badge.warn { background: rgba(245,158,11,.15); color: #fde68a; }
+
+        .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .btn { display: inline-flex; align-items: center; gap: 8px; font-weight: 800; letter-spacing: .3px;
+               padding: 8px 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,.08); background: rgba(255,255,255,.06);
+               text-decoration: none; color: var(--text); cursor: pointer; }
+        .btn:hover { filter: brightness(1.05); box-shadow: 0 0 0 3px var(--ring); }
+        .btn.primary { background: linear-gradient(135deg, #2563eb, #22c55e); }
+        .btn.success { background: rgba(34,197,94,.25); }
+        .btn.warn { background: rgba(245,158,11,.25); }
+        .btn.danger { background: rgba(239,68,68,.25); }
+
+        .input { width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,.1); background: #0a1220; color: var(--text); }
+
+        .section-title { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom: 8px; }
+        .searchbar { display:flex; gap:10px; align-items:center; }
+
+        /* Alert Container Styles */
+        .alert-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 2000;
+            width: 300px;
+        }
+
+        /* Alert Message Styles */
+        .alert {
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s, fadeOut 0.5s 5s forwards;
+        }
+
+        .alert-success {
+            background: var(--accent);
+            color: white;
+        }
+
+        .alert-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .alert-warning {
+            background: var(--warn);
+            color: white;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            to { opacity: 0; }
+        }
+
+        /* Confirmation Modal */
+        .confirmation-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 3000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .confirmation-modal {
+            background: var(--card);
+            border: 1px solid rgba(255,255,255,.06);
+            border-radius: var(--radius);
+            padding: 24px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: var(--shadow);
+        }
+
+        .confirmation-header {
+            margin-bottom: 16px;
+        }
+
+        .confirmation-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text);
+            margin: 0 0 8px 0;
+        }
+
+        .confirmation-message {
+            color: var(--muted);
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .confirmation-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .container { padding: 0 12px 60px; margin: 16px auto; }
+            .header { padding: 12px 16px; flex-direction: column; gap: 16px; }
+            .brand { justify-content: center; }
+            .header .right { width: 100%; justify-content: center; }
+            .grid-3 { grid-template-columns: 1fr; }
+            .section-title { flex-direction: column; align-items: stretch; }
+            .searchbar { width: 100%; }
+            .actions { justify-content: center; }
+            .table { font-size: 13px; }
+            .table th, .table td { padding: 8px 6px; }
+            .btn { font-size: 12px; padding: 6px 10px; }
+            .nav { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+<!-- Alert Container -->
+<div class="alert-container">
+    <div th:if="${alertMessage}"
+         th:classappend="'alert-' + ${alertType}"
+         class="alert" role="alert">
+        <i th:class="${alertType == 'success' ? 'fas fa-check-circle' :
+                      alertType == 'danger' ? 'fas fa-exclamation-circle' :
+                      'fas fa-info-circle'}"></i>
+        <span th:text="${alertMessage}"></span>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div id="confirmationOverlay" class="confirmation-overlay">
+    <div class="confirmation-modal">
+        <div class="confirmation-header">
+            <h3 id="confirmationTitle" class="confirmation-title">Confirm Action</h3>
+            <p id="confirmationMessage" class="confirmation-message">Are you sure you want to proceed?</p>
+        </div>
+        <div class="confirmation-actions">
+            <button class="btn" onclick="closeConfirmation()">Cancel</button>
+            <button id="confirmBtn" class="btn danger">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <div class="brand">
+            <div class="logo">
+                <img th:src="@{/images/spendsnap-logo1.png}" alt="SpendSnap Logo" />
+            </div>
+            <div>
+                <h1>SpendSnap • Admin Panel</h1>
+                <div class="sub" style="color:var(--muted); font-size:13px;">Manage users, roles, categories & activity</div>
+            </div>
+        </div>
+        <div class="right">
+            <span class="pill" th:text="${#dates.format(#dates.createNow(), 'dd MMM yyyy • HH:mm')}" title="Server time">--</span>
+            <a class="btn" th:href="@{/user/dashboard}">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav">
+        <a th:href="@{/adminSpendSnap/dashboard}" class="nav-item active">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+        <a th:href="@{/adminSpendSnap/categories}" class="nav-item">
+            <i class="fas fa-tags"></i> Categories
+        </a>
+    </div>
+
+    <!-- Dashboard Page -->
+    <div id="dashboard">
+        <!-- Overview / Stats -->
+        <div class="grid grid-3">
+            <div class="card">
+                <div class="stat">
+                    <div>
+                        <div class="label">Total Users</div>
+                        <div class="value" th:text="${totalUsers != null ? totalUsers : (users != null ? users.size() : 0)}">0</div>
+                    </div>
+                    <span class="badge info"><i class="fas fa-users"></i> All</span>
+                </div>
+            </div>
+            <div class="card">
+                <div class="stat">
+                    <div>
+                        <div class="label">Active Users</div>
+                        <div class="value" th:text="${activeUsers}">0</div>
+                    </div>
+                    <span class="badge success"><i class="fas fa-user-check"></i> Active</span>
+                </div>
+            </div>
+            <div class="card">
+                <div class="stat">
+                    <div>
+                        <div class="label">Inactive Users</div>
+                        <div class="value" th:text="${inactiveUsers}">0</div>
+                    </div>
+                    <span class="badge danger"><i class="fas fa-user-times"></i> Inactive</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Users Management -->
+        <div class="card" style="margin-top: 18px;">
+            <div class="section-title">
+                <h2><i class="fas fa-users-cog"></i> Users Management</h2>
+                <form class="searchbar" th:action="@{/adminSpendSnap/users}" method="get">
+                    <input class="input" type="text" name="q" placeholder="Search by name or email" th:value="${param.q}" />
+                    <button class="btn primary" type="submit"><i class="fas fa-search"></i> Search</button>
+                </form>
+            </div>
+            <div class="sub">Promote to admin, toggle active/inactive status, and manage users.</div>
+
+            <div style="overflow:auto; border-radius:12px; border:1px solid rgba(255,255,255,.06);">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>User</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Joined</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="u : ${users}">
+                        <td th:text="${u.id}">1</td>
+                        <td>
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <img th:if="${u.profilePictureUrl != null}"
+                                     th:src="${u.profilePictureUrl}"
+                                     alt="avatar"
+                                     style="width:32px;height:32px;border-radius:8px;object-fit:cover;border:1px solid rgba(255,255,255,.12)" />
+                                <div th:unless="${u.profilePictureUrl != null}"
+                                     style="width:32px;height:32px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:14px;"
+                                     th:text="${u.name != null ? #strings.toUpperCase(#strings.substring(u.name, 0, 1)) : '?'}">U</div>
+                                <div>
+                                    <div th:text="${u.name}" style="font-weight: 600;">User Name</div>
+                                    <div style="font-size: 11px; color: var(--muted);" th:text="'ID: ' + ${u.id}">ID: 1</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td th:text="${u.email}">email@domain.com</td>
+                        <td>
+                            <span class="badge" th:classappend="${u.role == 'ADMIN'} ? ' warn' : ' info'" th:text="${u.role}">
+                                <i th:class="${u.role == 'ADMIN'} ? 'fas fa-crown' : 'fas fa-user'"></i> USER
+                            </span>
+                        </td>
+                        <td>
+                            <span th:classappend="${u.active} ? 'badge success' : 'badge danger'">
+                                <i th:class="${u.active} ? 'fas fa-check-circle' : 'fas fa-times-circle'"></i>
+                                <span th:text="${u.active} ? 'Active' : 'Inactive'">Active</span>
+                            </span>
+                        </td>
+                        <td th:text="${#temporals.format(u.createdAt, 'dd MMM yyyy')}" title="Created at">--</td>
+                        <td>
+                            <div class="actions">
+                                <!-- Toggle Active/Inactive -->
+                                <button class="btn"
+                                        th:classappend="${u.active} ? ' warn' : ' success'"
+                                        th:data-id="${u.id}"
+                                        th:data-action="toggle-active"
+                                        th:data-action-name="${u.active} ? 'Deactivate' : 'Activate'"
+                                        th:data-item-name="${u.name}"
+                                        onclick="handleUserAction(this)">
+                                    <i th:class="${u.active} ? 'fas fa-user-times' : 'fas fa-user-check'"></i>
+                                    <span th:text="${u.active} ? 'Deactivate' : 'Activate'">Toggle</span>
+                                </button>
+
+                                <!-- Promote/Demote Role -->
+                                <button class="btn primary"
+                                        th:data-id="${u.id}"
+                                        th:data-action="role"
+                                        th:data-action-name="${u.role == 'ADMIN'} ? 'Remove Admin' : 'Make Admin'"
+                                        th:data-item-name="${u.name}"
+                                        onclick="handleUserAction(this)">
+                                    <i th:class="${u.role == 'ADMIN'} ? 'fas fa-user-minus' : 'fas fa-user-plus'"></i>
+                                    <span th:text="${u.role == 'ADMIN' ? 'Remove Admin' : 'Make Admin'}">Make ADMIN</span>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${users == null or #lists.isEmpty(users)}">
+                        <td colspan="7" style="color:var(--muted); text-align:center; padding:40px;">
+                            <i class="fas fa-users" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
+                            No users found.
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px;" th:if="${totalPages > 1}">
+                <div class="help">
+                    <i class="fas fa-info-circle"></i>
+                    Showing page <span th:text="${pageNumber + 1}">1</span> of <span th:text="${totalPages}">1</span>
+                </div>
+                <div class="actions">
+                    <a class="btn" th:href="@{/adminSpendSnap/dashboard(page=${pageNumber - 1}, q=${param.q})}" th:if="${pageNumber > 0}">
+                        <i class="fas fa-chevron-left"></i> Previous
+                    </a>
+                    <a class="btn" th:href="@{/adminSpendSnap/dashboard(page=${pageNumber + 1}, q=${param.q})}" th:if="${pageNumber + 1 < totalPages}">
+                        Next <i class="fas fa-chevron-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentAction = null;
+    let currentId = null;
+
+    function handleUserAction(button) {
+        const id = button.getAttribute('data-id');
+        const action = button.getAttribute('data-action');
+        const actionName = button.getAttribute('data-action-name');
+        const itemName = button.getAttribute('data-item-name');
+
+        confirmAction(id, action, actionName, itemName);
+    }
+
+    function confirmAction(id, action, actionName, itemName) {
+        currentId = id;
+        currentAction = action;
+
+        const overlay = document.getElementById('confirmationOverlay');
+        const title = document.getElementById('confirmationTitle');
+        const message = document.getElementById('confirmationMessage');
+        const confirmBtn = document.getElementById('confirmBtn');
+
+        title.textContent = `${actionName} Confirmation`;
+
+        if (action === 'toggle-active') {
+            message.textContent = `Are you sure you want to ${actionName.toLowerCase()} ${itemName}?`;
+            confirmBtn.className = actionName === 'Activate' ? 'btn success' : 'btn warn';
+        } else if (action === 'role') {
+            message.textContent = `Are you sure you want to ${actionName.toLowerCase()} for ${itemName}?`;
+            confirmBtn.className = 'btn primary';
+        }
+
+        overlay.style.display = 'flex';
+    }
+
+    function closeConfirmation() {
+        document.getElementById('confirmationOverlay').style.display = 'none';
+        currentAction = null;
+        currentId = null;
+    }
+
+    function executeAction() {
+        if (!currentAction || !currentId) return;
+
+        // Get CSRF token from meta tags
+        const token = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        const headerName = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+        let url = '';
+        let options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                [headerName]: token
+            }
+        };
+
+        if (currentAction === 'toggle-active') {
+            url = `/adminSpendSnap/users/${currentId}/toggle-active`;
+        } else if (currentAction === 'role') {
+            url = `/adminSpendSnap/users/${currentId}/role`;
+            const actionName = document.getElementById('confirmationTitle').textContent;
+            const roleValue = actionName.includes('Remove Admin') ? 'USER' : 'ADMIN';
+            options.body = `role=${roleValue}`;
+        }
+
+        fetch(url, options)
+            .then(response => {
+                if (response.redirected) {
+                    window.location.href = response.url;
+                } else {
+                    location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+        closeConfirmation();
+    }
+
+    // Set up confirm button click handler
+    document.getElementById('confirmBtn').addEventListener('click', executeAction);
+
+    // Auto-hide alerts after 5 seconds
+    document.addEventListener('DOMContentLoaded', function() {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            setTimeout(() => {
+                alert.style.opacity = '0';
+                setTimeout(() => {
+                    alert.remove();
+                }, 500);
+            }, 5000);
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Deleted | SpendSnap</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 650px;
+            overflow: hidden;
+            text-align: center;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .header {
+            background: linear-gradient(to right, #4361ee, #3a0ca3);
+            padding: 35px 25px;
+            color: white;
+            position: relative;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+            background: #4361ee;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .header h1 {
+            font-size: 2.4rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 50px 40px 40px;
+        }
+
+        .message-icon {
+            font-size: 5.5rem;
+            color: #4361ee;
+            margin-bottom: 25px;
+            animation: bounce 1.5s infinite alternate;
+        }
+
+        .user-name {
+            color: #4361ee;
+            font-weight: 700;
+            background: rgba(67, 97, 238, 0.1);
+            padding: 4px 12px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        .message {
+            font-size: 1.25rem;
+            line-height: 1.7;
+            color: #4a5568;
+            margin-bottom: 30px;
+        }
+
+        .recovery-info {
+            background: #f0f7ff;
+            border-left: 4px solid #4361ee;
+            padding: 22px;
+            border-radius: 10px;
+            margin: 30px 0;
+            text-align: left;
+            position: relative;
+        }
+
+        .recovery-info h3 {
+            color: #4361ee;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.3rem;
+        }
+
+        .countdown {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #e53e3e;
+            margin: 25px 0;
+            padding: 15px;
+            background: #fef5f5;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 10px rgba(229, 62, 62, 0.15);
+        }
+
+        .support-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 12px;
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .support-section h3 {
+            color: #4361ee;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 1.4rem;
+        }
+
+        .contact-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            background: linear-gradient(to right, #4361ee, #3a0ca3);
+            color: white;
+            text-decoration: none;
+            padding: 16px 35px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+            margin: 10px 0 20px;
+        }
+
+        .contact-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(67, 97, 238, 0.4);
+            gap: 15px;
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: linear-gradient(to right, #4361ee, #3a0ca3);
+            color: white;
+            text-decoration: none;
+            padding: 16px 35px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(67, 97, 238, 0.4);
+        }
+
+        .btn-outline {
+            background: white;
+            color: #4361ee;
+            border: 2px solid #4361ee;
+        }
+
+        .btn-outline:hover {
+            background: #f0f7ff;
+        }
+
+        .btn i {
+            font-size: 1.3rem;
+        }
+
+        .footer {
+            padding: 25px;
+            color: #718096;
+            font-size: 0.95rem;
+            border-top: 1px solid #e2e8f0;
+            background: #f8f9fa;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-10px); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @media (max-width: 650px) {
+            .container {
+                border-radius: 15px;
+            }
+
+            .header {
+                padding: 25px 20px;
+            }
+
+            .header h1 {
+                font-size: 1.9rem;
+            }
+
+            .content {
+                padding: 40px 25px 30px;
+            }
+
+            .message {
+                font-size: 1.1rem;
+            }
+
+            .btn-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 280px;
+            }
+
+            .contact-btn {
+                padding: 14px 30px;
+                font-size: 1.1rem;
+            }
+
+            .message-icon {
+                font-size: 4.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="logo">
+            <i class="fas fa-money-bill-wave"></i>
+        </div>
+        <h1>Account Successfully Deleted</h1>
+        <p>We're sorry to see you go</p>
+    </div>
+
+    <div class="content">
+        <div class="message-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+
+        <p class="message">
+            Dear <span class="user-name" th:text="${userName}">User</span>, your account has been successfully deleted from our system.
+        </p>
+
+        <div class="recovery-info">
+            <h3><i class="fas fa-exclamation-circle"></i> Important Recovery Information</h3>
+            <p>If this was a mistake, you can recover your account within the next 15 days by contacting our support team. After this period, your data will be permanently removed from our systems.</p>
+        </div>
+
+        <div class="countdown">
+            <i class="fas fa-clock"></i> Recovery window: 15 days from today
+        </div>
+
+        <div class="support-section">
+            <h3><i class="fas fa-headset"></i> Contact Support</h3>
+            <p>Need help or want to recover your account?</p>
+            <a href="mailto:abhijeetj9433@gmail.com" class="contact-btn pulse">
+                <i class="fas fa-paper-plane"></i> Contact Us Via Email
+            </a>
+        </div>
+
+        <div class="btn-container">
+            <a th:href="@{/}" class="btn">
+                <i class="fas fa-home"></i> Return to Home Page
+            </a>
+            <a href="#" class="btn btn-outline">
+                <i class="fas fa-question-circle"></i> Help Center
+            </a>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2023 SpendSnap. All rights reserved.</p>
+    </div>
+</div>
+
+<script>
+    // Add a simple countdown animation
+    document.addEventListener('DOMContentLoaded', function() {
+        const countdownEl = document.querySelector('.countdown');
+        const startDate = new Date();
+        const recoveryDays = 15;
+
+        function updateCountdown() {
+            const currentDate = new Date();
+            const elapsedDays = Math.floor((currentDate - startDate) / (1000 * 60 * 60 * 24));
+            const remainingDays = Math.max(0, recoveryDays - elapsedDays);
+
+            if (remainingDays > 0) {
+                countdownEl.innerHTML = `<i class="fas fa-clock"></i> Recovery window: ${remainingDays} day${remainingDays !== 1 ? 's' : ''} remaining`;
+            } else {
+                countdownEl.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Recovery window has expired`;
+                countdownEl.style.background = "#f8d7da";
+                countdownEl.style.color = "#721c24";
+            }
+        }
+
+        // Initial update
+        updateCountdown();
+
+        // Update every minute
+        setInterval(updateCountdown, 60000);
+    });
+
+    // Add animation to the contact button on hover
+    document.querySelector('.contact-btn').addEventListener('mouseover', function() {
+        this.classList.remove('pulse');
+    });
+
+    document.querySelector('.contact-btn').addEventListener('mouseout', function() {
+        this.classList.add('pulse');
+    });
+</script>
+</body>
+</html>

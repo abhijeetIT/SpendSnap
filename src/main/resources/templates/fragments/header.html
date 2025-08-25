@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<header th:fragment="header" class="header">
+    <div class="nav-container">
+        <a th:href="@{/user/dashboard}" class="nav-logo">
+            <img th:src="@{/images/spendsnap-logo.png}" alt="SpendSnap" class="logo-img">
+            <span class="logo-text">SpendSnap</span>
+        </a>
+
+        <button class="mobile-menu-toggle" aria-label="Toggle navigation">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <nav class="nav-menu">
+            <a th:href="@{/user/dashboard}"
+               class="nav-link"
+               th:classappend="${#httpServletRequest.requestURI.contains('/dashboard')} ? 'active' : ''">
+                <i class="fas fa-home"></i> Dashboard
+            </a>
+            <a th:href="@{/user/transactions}"
+               class="nav-link"
+               th:classappend="${#httpServletRequest.requestURI.contains('/transactions')} ? 'active' : ''">
+                <i class="fas fa-exchange-alt"></i> Transactions
+            </a>
+            <a th:href="@{/user/reports}"
+               class="nav-link"
+               th:classappend="${#httpServletRequest.requestURI.contains('/reports')} ? 'active' : ''">
+                <i class="fas fa-chart-bar"></i> Reports
+            </a>
+            <a th:href="@{/user/categories}"
+               class="nav-link"
+               th:classappend="${#httpServletRequest.requestURI.contains('/categories')} ? 'active' : ''">
+                <i class="fas fa-tags"></i> Categories
+            </a>
+        </nav>
+
+        <div class="user-profile">
+            <div class="user-dropdown">
+                <div class="user-avatar"
+                     th:text="${#strings.abbreviate(user.name,1)} + ${#strings.abbreviate(user.surname,1)}">
+                </div>
+                <div class="dropdown-menu">
+                    <a th:href="@{/user/profile}"><i class="fas fa-user"></i> Profile</a>
+                    <a th:href="@{/user/settings}"><i class="fas fa-cog"></i> Settings</a>
+                    <form th:action="@{/logout}" method="post" class="logout-form">
+                        <button type="submit"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<style th:inline="none">
+    /* Header specific styles */
+    .header {
+        background: white;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        position: fixed;
+        width: 100%;
+        top: 0;
+        z-index: 1000;
+        padding: 15px 0;
+    }
+
+    .nav-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    .nav-logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+    }
+
+    .logo-img {
+        height: 40px;
+        width: auto;
+    }
+
+    .logo-text {
+        font-weight: 700;
+        font-size: 1.2rem;
+        color: var(--dark);
+    }
+
+    /* Navigation Menu */
+    .nav-menu {
+        display: flex;
+        gap: 15px;
+    }
+
+    .nav-link {
+        text-decoration: none;
+        color: var(--gray-700);
+        font-weight: 500;
+        padding: 8px 12px;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .nav-link:hover, .nav-link.active {
+        color: var(--primary);
+        background: rgba(67, 97, 238, 0.1);
+    }
+
+    /* User Profile */
+    .user-profile {
+        position: relative;
+    }
+
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        cursor: pointer;
+        background: var(--primary);
+    }
+
+    .dropdown-menu {
+        position: absolute;
+        right: 0;
+        top: 50px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        width: 200px;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        z-index: 1000;
+    }
+
+    .dropdown-menu a, .logout-form button {
+        display: block;
+        padding: 12px 15px;
+        color: var(--gray-700);
+        text-decoration: none;
+        transition: all 0.3s ease;
+        width: 100%;
+        text-align: left;
+        background: none;
+        border: none;
+        cursor: pointer;
+    }
+
+    .dropdown-menu a:hover, .logout-form button:hover {
+        background: var(--gray-100);
+        color: var(--primary);
+    }
+
+    .logout-form button {
+        width: 100%;
+    }
+
+    .user-dropdown:hover .dropdown-menu {
+        opacity: 1;
+        visibility: visible;
+        top: 45px;
+    }
+
+    /* Mobile Menu */
+    .mobile-menu-toggle {
+        display: none;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: var(--dark);
+        cursor: pointer;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 992px) {
+        .nav-menu {
+            position: fixed;
+            top: 70px;
+            left: 0;
+            right: 0;
+            background: white;
+            flex-direction: column;
+            padding: 20px;
+            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+            transform: translateY(-150%);
+            transition: transform 0.3s ease;
+            z-index: 999;
+        }
+
+        .nav-menu.show {
+            transform: translateY(0);
+        }
+
+        .mobile-menu-toggle {
+            display: block;
+        }
+
+        .dropdown-menu {
+            right: 20px;
+        }
+    }
+</style>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    // Mobile menu toggle functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const mobileToggle = document.querySelector('.mobile-menu-toggle');
+        if (mobileToggle) {
+            mobileToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const navMenu = document.querySelector('.nav-menu');
+                navMenu.classList.toggle('show');
+            });
+        }
+
+        // User dropdown functionality
+        const userAvatar = document.querySelector('.user-avatar');
+        if (userAvatar) {
+            userAvatar.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const dropdown = document.querySelector('.dropdown-menu');
+                dropdown.style.opacity = dropdown.style.opacity === '1' ? '0' : '1';
+                dropdown.style.visibility = dropdown.style.visibility === 'visible' ? 'hidden' : 'visible';
+            });
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function() {
+            const dropdown = document.querySelector('.dropdown-menu');
+            if (dropdown) {
+                dropdown.style.opacity = '0';
+                dropdown.style.visibility = 'hidden';
+            }
+            const navMenu = document.querySelector('.nav-menu');
+            if (navMenu && navMenu.classList.contains('show')) {
+                navMenu.classList.remove('show');
+            }
+        });
+    });
+    /*]]>*/
+</script>
+</body>
+</html>

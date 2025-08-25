@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | SpendSnap</title>
+    <link rel="icon" th:href="@{/images/spendsnap-logo1.png}" type="image/png">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3730a3;
+            --accent: #f72585;
+            --accent-dark: #e61473;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark);
+        }
+
+        /* Alert Container Styles */
+        .alert-container {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 2000;
+            width: 300px;
+        }
+
+        /* Alert Message Styles */
+        .alert {
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s, fadeOut 0.5s 5s forwards;
+        }
+
+        .alert-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .alert-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .alert-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        /* Form Validation Styles */
+        .invalid-feedback {
+            color: var(--danger);
+            font-size: 0.8rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .is-invalid {
+            border-color: var(--danger) !important;
+        }
+
+        .was-validated .form-control:invalid,
+        .was-validated .form-select:invalid {
+            border-color: var(--danger);
+        }
+
+        .was-validated .form-control:invalid ~ .invalid-feedback,
+        .was-validated .form-select:invalid ~ .invalid-feedback {
+            display: block;
+        }
+
+        /* Animations */
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            to { opacity: 0; }
+        }
+
+        /* Loading Spinner */
+        .fa-spinner {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Header Styles */
+        .header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            padding: 15px 0;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .logo-img {
+            height: 40px;
+            width: auto;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--gray-700);
+            font-weight: 500;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary);
+            background: rgba(67, 97, 238, 0.1);
+        }
+
+        .nav-link i {
+            margin-right: 8px;
+        }
+
+        /* User Profile Styles */
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+        }
+
+        .profile-link {
+            display: inline-block;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .profile-link:hover .avatar-img,
+        .profile-link:hover .avatar-initials {
+            transform: scale(1.05);
+            opacity: 0.9;
+        }
+
+        .avatar-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ffffff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease;
+        }
+
+        .avatar-initials {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--primary);
+            color: white;
+            font-weight: bold;
+            font-size: 1.1em;
+            text-transform: uppercase;
+            border: 2px solid #ffffff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease;
+        }
+
+        .avatar-img:hover,
+        .avatar-initials:hover {
+            transform: scale(1.05);
+        }
+
+        /* Logout Button Styles */
+        .logout-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .logout-btn:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
+        }
+
+        .logout-btn:active {
+            transform: translateY(0);
+        }
+
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--dark);
+            cursor: pointer;
+        }
+
+        /* Dashboard Layout */
+        .dashboard-container {
+            display: flex;
+            margin-top: 70px;
+            min-height: calc(100vh - 70px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: white;
+            border-right: 1px solid var(--gray-200);
+            padding: 20px;
+            position: fixed;
+            height: calc(100vh - 70px);
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-menu {
+            margin-top: 30px;
+            flex: 1;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            margin-bottom: 5px;
+            border-radius: 8px;
+            color: var(--gray-700);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-item:hover, .sidebar-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .sidebar-item i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Sidebar Logout Button */
+        .sidebar-logout {
+            margin-top: auto;
+            padding-top: 20px;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .sidebar-logout-btn {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-radius: 8px;
+            background: var(--danger);
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            border: none;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .sidebar-logout-btn:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
+        }
+
+        .sidebar-logout-btn i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            margin-left: 250px;
+        }
+
+        .greeting {
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+        }
+
+        .greeting span {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Single Card for Expenses */
+        .expense-card-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            max-width: 350px;
+            width: 100%;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            color: var(--gray-600);
+            font-weight: 500;
+        }
+
+        .card-icon {
+            color: var(--danger);
+            font-size: 1.4rem;
+        }
+
+        .card-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--danger);
+        }
+
+        /* Transactions Table */
+        .transactions-section {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .transactions-header {
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            color: var(--dark);
+        }
+
+        .transactions-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .transactions-table th {
+            background: var(--gray-100);
+            padding: 15px;
+            text-align: left;
+            color: var(--gray-700);
+            font-weight: 600;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .transactions-table td {
+            padding: 15px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .transaction-category {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Fix for dashboard category icons */
+        .dashboard-category .category-icon-container {
+            width: 24px;
+            height: 24px;
+        }
+
+        .dashboard-category .category-icon-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .dashboard-category .category-icon-default {
+            width: 24px;
+            height: 24px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+        }
+
+        /* Category Icon Styles */
+        .category-icon-container {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .category-icon-img {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+        }
+
+        .category-icon-default {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        /* Category Color Classes */
+        .food, .grocery, .restaurant { background: #f59e0b; }
+        .transport, .travel, .fuel, .taxi { background: #3b82f6; }
+        .shopping, .clothes, .electronics { background: #8b5cf6; }
+        .entertainment, .movies, .games { background: #ec4899; }
+        .bills, .utilities, .rent, .insurance { background: #6366f1; }
+        .health, .medical, .pharmacy { background: #ef4444; }
+        .education, .books, .courses { background: #06b6d4; }
+        .other { background: #64748b; }
+
+        .amount.positive {
+            color: var(--success);
+            font-weight: 600;
+        }
+        .amount.negative {
+             color: var(--danger);
+             font-weight: 600;
+        }
+
+        /* Add Button */
+        .add-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 15px rgba(247, 37, 133, 0.3);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .add-btn:hover {
+            background: var(--accent-dark);
+            transform: scale(1.1);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            width: 90%;
+            max-width: 600px;
+            animation: modalopen 0.3s;
+        }
+
+        @keyframes modalopen {
+            from {opacity: 0; transform: translateY(-50px);}
+            to {opacity: 1; transform: translateY(0);}
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            color: var(--dark);
+            margin: 0;
+        }
+
+        .close-btn {
+            color: var(--gray-600);
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .close-btn:hover {
+            color: var(--danger);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--gray-700);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid var(--gray-300);
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid var(--gray-300);
+            border-radius: 6px;
+            font-size: 1rem;
+            background-color: white;
+            cursor: pointer;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+        }
+
+        .btn-cancel {
+            background: var(--gray-200);
+            color: var(--gray-700);
+        }
+
+        .btn-cancel:hover {
+            background: var(--gray-300);
+        }
+
+        .btn-submit {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-submit:hover {
+            background: #0ea271;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+                z-index: 900;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .nav-menu {
+                display: none;
+            }
+
+            .user-profile {
+                gap: 10px;
+            }
+
+            .logout-btn {
+                padding: 8px 12px;
+                font-size: 0.85rem;
+            }
+
+            .logout-btn span {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                padding: 0 15px;
+            }
+
+            .main-content {
+                padding: 15px;
+            }
+
+            .greeting {
+                font-size: 1.5rem;
+                text-align: center;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .card-value {
+                font-size: 1.8rem;
+            }
+
+            .transactions-table {
+                font-size: 0.9rem;
+            }
+
+            .transactions-table th,
+            .transactions-table td {
+                padding: 10px 8px;
+            }
+
+            .category-icon {
+                width: 30px;
+                height: 30px;
+            }
+
+            .add-btn {
+                bottom: 20px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+            }
+
+            .dashboard-category .category-icon-container,
+            .dashboard-category .category-icon-default {
+                width: 20px;
+                height: 20px;
+                font-size: 10px;
+            }
+
+            .user-profile {
+                gap: 8px;
+            }
+
+            .logout-btn {
+                padding: 6px 10px;
+                min-width: 40px;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .transactions-table th:nth-child(3),
+            .transactions-table td:nth-child(3) {
+                display: none;
+            }
+
+            .transactions-table {
+                font-size: 0.8rem;
+            }
+
+            .card-title {
+                font-size: 1rem;
+            }
+
+            .nav-container {
+                padding: 0 10px;
+            }
+
+            .user-profile {
+                gap: 6px;
+            }
+
+            .logout-btn {
+                padding: 6px 8px;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Overlay for mobile sidebar */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 850;
+        }
+
+        @media (max-width: 992px) {
+            .sidebar-overlay.active {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Alert Container -->
+<div class="alert-container">
+    <div th:if="${alertMessage}"
+         th:classappend="'alert-' + ${alertType}"
+         class="alert" role="alert">
+        <i th:class="${alertType == 'success' ? 'fas fa-check-circle' :
+                      alertType == 'danger' ? 'fas fa-exclamation-circle' :
+                      'fas fa-info-circle'}"></i>
+        <span th:text="${alertMessage}"></span>
+    </div>
+</div>
+
+<!-- Header -->
+<header class="header">
+    <div class="nav-container">
+        <a th:href="@{/user/dashboard}" class="nav-logo">
+            <img th:src="@{/images/spendsnap-logo.png}" alt="SpendSnap" class="logo-img">
+        </a>
+
+        <button class="mobile-menu-toggle">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <nav class="nav-menu">
+            <a th:href="@{/user/dashboard}" class="nav-link active">
+                <i class="fas fa-home"></i> Dashboard
+            </a>
+            <a th:href="@{/user/transactions}" class="nav-link">
+                <i class="fas fa-exchange-alt"></i> Transactions
+            </a>
+            <a th:href="@{/user/categories}" class="nav-link">
+                <i class="fas fa-tags"></i> Categories
+            </a>
+        </nav>
+
+        <div class="user-profile">
+            <a th:href="@{/user/profile}" class="profile-link">
+                <!-- Profile Picture -->
+                <img th:if="${user != null and user.profilePictureUrl != null and !user.profilePictureUrl.isEmpty()}"
+                     th:src="${user.profilePictureUrl}"
+                     alt="User Avatar"
+                     class="avatar-img">
+
+                <!-- User Initials -->
+                <div th:if="${user != null and (user.profilePictureUrl == null or user.profilePictureUrl.isEmpty())}"
+                     class="avatar-initials"
+                     th:text="${user.name != null ? #strings.toUpperCase(#strings.substring(user.name, 0, 1)) : '?'}">
+                </div>
+
+                <!-- Fallback -->
+                <div th:unless="${user != null}"
+                     class="avatar-initials">?
+                </div>
+            </a>
+
+        </div>
+    </div>
+</header>
+
+<!-- Sidebar Overlay for Mobile -->
+<div class="sidebar-overlay"></div>
+
+<!-- Dashboard Layout -->
+<div class="dashboard-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-menu">
+            <a th:href="@{/user/dashboard}" class="sidebar-item active">
+                <i class="fas fa-home"></i> Dashboard
+            </a>
+            <a th:href="@{/user/transactions}" class="sidebar-item">
+                <i class="fas fa-exchange-alt"></i> Transactions
+            </a>
+            <a th:href="@{/user/categories}" class="sidebar-item">
+                <i class="fas fa-tags"></i> Categories
+            </a>
+            <a th:href="@{/user/profile}" class="sidebar-item">
+                <i class="fas fa-user"></i> Profile
+            </a>
+        </div>
+
+        <!-- Sidebar Logout -->
+        <div class="sidebar-logout">
+            <form th:action="@{/logout}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <button type="submit" class="sidebar-logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Dynamic greeting with user's first name -->
+        <h1 class="greeting">Welcome back, <span th:text="${#strings.substringBefore(user.name, ' ') ?: user.name}">?</span>!</h1>
+
+        <!-- Single Expense Card -->
+        <div class="expense-card-container">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">This Month's Expenses</h3>
+                    <i class="fas fa-arrow-up card-icon"></i>
+                </div>
+                <div class="card-value" th:text="'₹' + ${#numbers.formatDecimal(monthlyExpenses ?: 0, 0, 'COMMA', 2, 'POINT')}">₹0.00</div>
+            </div>
+        </div>
+
+        <!-- Recent Transactions -->
+        <div class="transactions-section">
+            <h2 class="transactions-header">Recent Transactions</h2>
+            <table class="transactions-table">
+                <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th>Date</th>
+                    <th>Amount</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- Dynamic transaction rows -->
+                <tr th:each="expense : ${recentExpenses}" th:if="${recentExpenses != null and !recentExpenses.isEmpty()}">
+                    <td>
+                        <div class="transaction-category dashboard-category">
+                            <div class="category-icon-container dashboard-icon-container">
+                                <img th:if="${expense.category?.icon != null}"
+                                     th:src="${expense.category.icon}"
+                                     alt="Category Icon"
+                                     class="category-icon-img dashboard-icon-img"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+
+                                <div th:unless="${expense.category?.icon != null}"
+                                     class="category-icon-default dashboard-icon-default"
+                                     th:classappend="${expense.category?.name != null ? #strings.toLowerCase(#strings.replace(expense.category.name, ' ', '')) : 'other'}">
+                                    <i class="fas fa-tag"></i>
+                                </div>
+                            </div>
+                            <span class="dashboard-category-name" th:text="${expense.category?.name} ?: 'Uncategorized'">Food</span>
+                        </div>
+                    </td>
+                    <td th:text="${expense.description}">Description</td>
+                    <td th:text="${expense.date != null ? #temporals.format(expense.date, 'MMM dd, yyyy') : 'N/A'}">Date</td>
+                    <td class="amount negative">
+                        <span>-₹</span>
+                        <span th:text="${#numbers.formatDecimal(T(java.lang.Math).abs(expense.amount), 1, 2)}"></span>
+                    </td>
+                </tr>
+                <!-- Fallback row when no transactions exist -->
+                <tr th:if="${recentExpenses == null or recentExpenses.isEmpty()}">
+                    <td colspan="4" style="text-align: center; color: var(--gray-600); padding: 30px;">
+                        <i class="fas fa-receipt" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
+                        No recent transactions found
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Add Transaction Button -->
+        <button class="add-btn" onclick="openExpenseModal()">
+            <i class="fas fa-plus"></i>
+        </button>
+    </main>
+</div>
+
+<!-- Expense Modal Form -->
+<div id="expenseModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Add New Expense</h3>
+            <button class="close-btn" onclick="closeExpenseModal()">&times;</button>
+        </div>
+        <form id="expenseForm" th:action="@{/user/expenses/add}" th:object="${expense}" method="post" novalidate>
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <input type="hidden" th:field="*{id}"/>
+            <input type="hidden" th:field="*{user.id}"/>
+
+            <div class="form-group">
+                <label for="expenseAmount" class="form-label">Amount</label>
+                <input type="number" step="0.01" min="0" class="form-control" id="expenseAmount"
+                       th:field="*{amount}" placeholder="Enter amount" required>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('amount')}">
+                    <span th:errors="*{amount}"></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="expenseDescription" class="form-label">Description</label>
+                <input type="text" class="form-control" id="expenseDescription"
+                       th:field="*{description}" placeholder="Enter description">
+            </div>
+
+            <div class="form-group">
+                <label for="expenseDate" class="form-label">Date</label>
+                <input type="date" class="form-control" id="expenseDate"
+                       th:field="*{date}" required>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('date')}">
+                    <span th:errors="*{date}"></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="expenseCategory" class="form-label">Category</label>
+                <select class="form-select" id="expenseCategory" th:field="*{category.id}" required>
+                    <option value="">Select a category</option>
+                    <option th:each="category : ${categories}"
+                            th:value="${category.id}"
+                            th:text="${category.name}">
+                    </option>
+                </select>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('category')}">
+                    <span th:errors="*{category}"></span>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn btn-cancel" onclick="closeExpenseModal()">Cancel</button>
+                <button type="submit" id="expenseSubmitBtn" class="btn btn-submit">
+                    <span class="btn-text">Add Expense</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    // ========== MODAL FUNCTIONS ==========
+    function openExpenseModal() {
+        document.getElementById('expenseModal').style.display = 'block';
+        document.getElementById('expenseForm').classList.remove('was-validated');
+
+        // Set max date to today (restrict future dates)
+        const today = new Date().toISOString().split('T')[0];
+        const expenseDateInput = document.getElementById('expenseDate');
+        expenseDateInput.max = today;
+        expenseDateInput.value = today; // Set default to today
+    }
+
+    function closeExpenseModal() {
+        document.getElementById('expenseModal').style.display = 'none';
+        clearValidationErrors('expenseForm');
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const expenseModal = document.getElementById('expenseModal');
+
+        if (event.target == expenseModal) {
+            closeExpenseModal();
+        }
+    }
+
+    // ========== FORM VALIDATION & SUBMISSION HANDLERS ==========
+    const forms = document.querySelectorAll('form[novalidate]');
+    forms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            if (!form.checkValidity()) {
+                e.preventDefault();
+                e.stopPropagation();
+                form.classList.add('was-validated');
+            } else {
+                const submitBtn = form.querySelector('button[type="submit"]');
+                if (submitBtn && !submitBtn.classList.contains('logout-btn') && !submitBtn.classList.contains('sidebar-logout-btn')) {
+                    submitBtn.disabled = true;
+                    const btnText = submitBtn.querySelector('.btn-text');
+                    if (btnText) {
+                        btnText.textContent = 'Processing...';
+                    }
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                }
+            }
+        });
+    });
+
+    // ========== LOGOUT CONFIRMATION ==========
+    document.querySelectorAll('.logout-btn, .sidebar-logout-btn').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            if (confirm('Are you sure you want to logout?')) {
+                // Find the parent form and submit it
+                const form = this.closest('form');
+                if (form) {
+                    form.submit();
+                }
+            }
+        });
+    });
+
+    // ========== HELPER FUNCTIONS ==========
+    function clearValidationErrors(formId) {
+        const form = document.getElementById(formId);
+        const errorElements = form.querySelectorAll('.is-invalid, .invalid-feedback');
+        errorElements.forEach(el => {
+            el.classList.remove('is-invalid');
+            el.style.display = 'none';
+        });
+
+        // Reset submit button state
+        const submitBtn = form.querySelector('button[type="submit"]');
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<span class="btn-text">Add Expense</span>';
+        }
+    }
+
+    // ========== ALERT HANDLING ==========
+    // Show alerts from server
+    const alert = document.querySelector('.alert');
+    if (alert) {
+        setTimeout(() => {
+            alert.remove();
+        }, 5000);
+    }
+
+    function showAlert(message, type) {
+        const alertContainer = document.createElement('div');
+        alertContainer.className = `alert alert-${type}`;
+        alertContainer.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check' : 'exclamation'}-circle"></i>
+            ${message}
+        `;
+        document.querySelector('.alert-container').appendChild(alertContainer);
+
+        setTimeout(() => {
+            alertContainer.style.animation = 'fadeOut 0.5s forwards';
+            setTimeout(() => alertContainer.remove(), 500);
+        }, 3000);
+    }
+
+    // ========== MOBILE MENU TOGGLE ==========
+    // Mobile menu toggle
+    const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+    const sidebar = document.querySelector('.sidebar');
+    const sidebarOverlay = document.querySelector('.sidebar-overlay');
+
+    mobileMenuToggle.addEventListener('click', function() {
+        sidebar.classList.toggle('active');
+        sidebarOverlay.classList.toggle('active');
+    });
+
+    // Close sidebar when clicking on overlay
+    sidebarOverlay.addEventListener('click', function() {
+        sidebar.classList.remove('active');
+        sidebarOverlay.classList.remove('active');
+    });
+
+    // ========== INITIALIZE DATE RESTRICTIONS ON PAGE LOAD ==========
+    document.addEventListener('DOMContentLoaded', function() {
+        const today = new Date().toISOString().split('T')[0];
+
+        // Set max date for date input
+        const expenseDateInput = document.getElementById('expenseDate');
+
+        if (expenseDateInput) {
+            expenseDateInput.max = today;
+        }
+    });
+    /*]]>*/
+</script>
+</body>
+</html>

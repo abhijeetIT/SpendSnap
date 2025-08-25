@@ -26,7 +26,7 @@ public class Goal {
     private LocalDate deadline;
 
     @ManyToOne
-    @JoinColumn(name = "user_email", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @CreatedDate
@@ -57,6 +57,14 @@ public class Goal {
 
     public Double getTargetAmount() {
         return targetAmount;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public void setTargetAmount(Double targetAmount) {

@@ -8,8 +8,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "budgets")
-public class Budget {
+@Table(name = "income")
+public class Income {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,11 +18,10 @@ public class Budget {
     @Column(nullable = false)
     private Double amount;
 
-    @Column(nullable = false)
-    private LocalDate startDate;
+    private String description;
 
     @Column(nullable = false)
-    private LocalDate endDate;
+    private LocalDate date;
 
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
@@ -39,10 +38,12 @@ public class Budget {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-
-    public Budget() {
+    public Income() {
     }
 
+    public Long getId() {
+        return id;
+    }
 
     public Double getAmount() {
         return amount;
@@ -52,20 +53,24 @@ public class Budget {
         this.amount = amount;
     }
 
-    public LocalDate getStartDate() {
-        return startDate;
+    public String getDescription() {
+        return description;
     }
 
-    public void setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public LocalDate getEndDate() {
-        return endDate;
+    public LocalDate getDate() {
+        return date;
     }
 
-    public void setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 
     public Category getCategory() {
@@ -88,5 +93,7 @@ public class Budget {
         return createdAt;
     }
 
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
 }
-

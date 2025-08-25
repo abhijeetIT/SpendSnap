@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+
+    <title>Expenses | SpendSnap</title>
+    <link rel="icon" th:href="@{/images/spendsnap-logo1.png}" type="image/png">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/transaction.css}">
+</head>
+<body>
+<!-- Mobile Menu Overlay -->
+<div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+
+<!-- Alert Container -->
+<div class="alert-container">
+    <div th:if="${alertMessage}"
+         th:classappend="'alert-' + ${alertType}"
+         class="alert" role="alert">
+        <i th:class="${alertType == 'success' ? 'fas fa-check-circle' :
+                      alertType == 'danger' ? 'fas fa-exclamation-circle' :
+                      'fas fa-info-circle'}"></i>
+        <span th:text="${alertMessage}"></span>
+    </div>
+</div>
+
+<!-- Header with Same Navbar -->
+<header class="header">
+    <div class="nav-container">
+        <a th:href="@{/user/dashboard}" class="nav-logo">
+            <img th:src="@{/images/spendsnap-logo.png}" alt="SpendSnap" class="logo-img">
+        </a>
+
+        <button class="mobile-menu-toggle" id="mobileMenuToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <nav class="nav-menu" id="navMenu">
+            <a th:href="@{/user/dashboard}" class="nav-link">
+                <i class="fas fa-home"></i> Dashboard
+            </a>
+            <a th:href="@{/user/transaction}" class="nav-link active">
+                <i class="fas fa-exchange-alt"></i> transaction
+            </a>
+            <a th:href="@{/user/categories}" class="nav-link">
+                <i class="fas fa-tags"></i> Categories
+            </a>
+        </nav>
+
+        <div class="user-profile">
+            <a th:href="@{/user/profile}" class="profile-link">
+                <!-- Profile Picture -->
+                <img th:if="${user != null and user.profilePictureUrl != null and !user.profilePictureUrl.isEmpty()}"
+                     th:src="${user.profilePictureUrl}"
+                     alt="User Avatar"
+                     class="avatar-img">
+
+                <!-- User Initials -->
+                <div th:if="${user != null and (user.profilePictureUrl == null or user.profilePictureUrl.isEmpty())}"
+                     class="avatar-initials"
+                     th:text="${user.name != null ? #strings.toUpperCase(#strings.substring(user.name, 0, 1)) : '?'}">
+                </div>
+
+                <!-- Fallback -->
+                <div th:unless="${user != null}"
+                     class="avatar-initials">?
+                </div>
+            </a>
+        </div>
+    </div>
+</header>
+
+<!-- Main Content -->
+<main class="main-container">
+    <div class="page-header">
+        <h1 class="page-title">Your Expenses</h1>
+        <div class="btn-group">
+            <button onclick="openExpenseModal()" class="btn btn-primary">
+                <i class="fas fa-plus-circle"></i> Add Expense
+            </button>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters">
+        <!-- Category Dropdown -->
+        <div class="filter-group">
+            <label class="filter-label">Category:</label>
+            <select class="filter-select" id="category-filter" name="categoryId">
+                <option value="all"
+                        th:selected="${param.categoryId == null or param.categoryId[0] == 'all'}">
+                    All Categories
+                </option>
+                <option th:each="category : ${categories}"
+                        th:value="${category.id}"
+                        th:text="${category.name}"
+                        th:selected="${param.categoryId != null and param.categoryId[0] == category.id.toString()}">
+                </option>
+            </select>
+        </div>
+
+        <!-- Date Dropdown -->
+        <div class="filter-group">
+            <label class="filter-label">Period:</label>
+            <select class="filter-select" id="date-filter" name="dateFilter">
+                <option value="all" th:selected="${param.dateFilter == null or param.dateFilter[0] == 'all'}">All Time</option>
+                <option value="today" th:selected="${param.dateFilter != null and param.dateFilter[0] == 'today'}">Today</option>
+                <option value="week" th:selected="${param.dateFilter != null and param.dateFilter[0] == 'week'}">This Week</option>
+                <option value="month" th:selected="${param.dateFilter != null and param.dateFilter[0] == 'month'}">This Month</option>
+                <option value="year" th:selected="${param.dateFilter != null and param.dateFilter[0] == 'year'}">This Year</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Expenses Table -->
+    <div class="transactions-container">
+        <table class="transactions-table">
+            <thead>
+            <tr>
+                <th>Date</th>
+                <th>Category</th>
+                <th>Description</th>
+                <th>Amount</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Expense Transactions -->
+            <tr th:each="expense : ${expenses}">
+                <td th:text="${#temporals.format(expense.date, 'dd MMM yyyy')}">01 Jun 2023</td>
+                <td>
+                    <div class="transaction-category">
+                        <div class="category-icon-container">
+                            <img th:if="${expense.category?.icon != null}"
+                                 th:src="${expense.category.icon}"
+                                 alt="Category Icon"
+                                 class="category-icon-img">
+                            <div th:unless="${expense.category?.icon != null}"
+                                 class="category-icon-default"
+                                 th:classappend="${expense.category?.name != null ? #strings.toLowerCase(#strings.replace(expense.category.name, ' ', '')) : 'other'}">
+                                <i class="fas fa-tag"></i>
+                            </div>
+                        </div>
+                        <span th:text="${expense.category?.name} ?: 'Uncategorized'">food</span>
+                    </div>
+                </td>
+                <td th:text="${expense.description} ?: 'No description'">Dinner at restaurant</td>
+                <td class="amount expense" th:text="'-₹' + ${#numbers.formatDecimal(expense.amount, 1, 2)}">
+                    -₹
+                </td>
+                <td>
+                    <div class="transaction-actions">
+                        <!-- Edit Button -->
+                        <button class="action-btn edit-btn"
+                                th:data-id="${expense.id}"
+                                th:data-amount="${expense.amount}"
+                                th:data-description="${expense.description}"
+                                th:data-date="${#temporals.format(expense.date, 'yyyy-MM-dd')}"
+                                th:data-category-id="${expense.category?.id}"
+                                onclick="openEditExpenseModal(this)"
+                                title="Edit this expense">
+                            <i class="fas fa-edit"></i>
+                        </button>
+
+                        <!-- Delete Button -->
+                        <button class="action-btn delete-btn"
+                                th:data-id="${expense.id}"
+                                onclick="confirmDeleteExpense(this)"
+                                title="Delete this expense">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="pagination" th:if="${totalPages > 0}">
+        <!-- Previous link -->
+        <a th:if="${currentPage > 1}"
+           th:href="@{/user/transactions(
+           currentPage=${currentPage - 1},
+           size=${size},
+           categoryId=${param.categoryId},
+           dateFilter=${param.dateFilter}
+       )}"
+           class="page-link">
+            <i class="fas fa-chevron-left"></i>
+        </a>
+
+        <!-- Page numbers -->
+        <a th:each="pageNum : ${#numbers.sequence(1, totalPages)}"
+           th:href="@{/user/transactions(
+           currentPage=${pageNum},
+           size=${size},
+           categoryId=${param.categoryId},
+           dateFilter=${param.dateFilter}
+       )}"
+           th:class="${pageNum == currentPage} ? 'page-link active' : 'page-link'"
+           th:text="${pageNum}">
+        </a>
+
+        <!-- Next link -->
+        <a th:if="${currentPage < totalPages}"
+           th:href="@{/user/transactions(
+           currentPage=${currentPage + 1},
+           size=${size},
+           categoryId=${param.categoryId},
+           dateFilter=${param.dateFilter}
+       )}"
+           class="page-link">
+            <i class="fas fa-chevron-right"></i>
+        </a>
+    </div>
+
+</main>
+
+<!-- Enhanced Expense Modal Form -->
+<div id="expenseModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title" id="modalTitle">
+                <i class="fas fa-plus-circle" id="modalIcon"></i>
+                <span id="modalTitleText">Add New Expense</span>
+            </h3>
+            <button class="close-btn" onclick="closeExpenseModal()">&times;</button>
+        </div>
+        <form id="expenseForm" th:action="@{/user/expenses/add}" th:object="${expense}" method="post" novalidate>
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <input type="hidden" th:field="*{id}" id="expenseId"/>
+            <input type="hidden" th:field="*{user.id}"/>
+
+            <div class="form-group">
+                <label for="expenseAmount" class="form-label">
+                    <i class="fas fa-rupee-sign" style="color: var(--primary); margin-right: 5px;"></i>
+                    Amount *
+                </label>
+                <input type="number" step="0.01" min="0" class="form-control" id="expenseAmount"
+                       th:field="*{amount}" placeholder="Enter amount" required>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('amount')}">
+                    <span th:errors="*{amount}"></span>
+                </div>
+                <div class="invalid-feedback">Please enter a valid amount.</div>
+            </div>
+
+            <div class="form-group">
+                <label for="expenseDescription" class="form-label">
+                    <i class="fas fa-align-left" style="color: var(--primary); margin-right: 5px;"></i>
+                    Description
+                </label>
+                <input type="text" class="form-control" id="expenseDescription"
+                       th:field="*{description}" placeholder="Enter description (optional)">
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('description')}">
+                    <span th:errors="*{description}"></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="expenseDate" class="form-label">
+                    <i class="fas fa-calendar-alt" style="color: var(--primary); margin-right: 5px;"></i>
+                    Date *
+                </label>
+                <input type="date" class="form-control" id="expenseDate"
+                       th:field="*{date}" required>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('date')}">
+                    <span th:errors="*{date}"></span>
+                </div>
+                <div class="invalid-feedback">Please select a valid date.</div>
+            </div>
+
+            <div class="form-group">
+                <label for="expenseCategory" class="form-label">
+                    <i class="fas fa-tags" style="color: var(--primary); margin-right: 5px;"></i>
+                    Category *
+                </label>
+                <select class="form-select" id="expenseCategory" th:field="*{category.id}" required>
+                    <option value="">Choose a category</option>
+                    <option th:each="category : ${categories}"
+                            th:value="${category.id}"
+                            th:text="${category.name}">
+                    </option>
+                </select>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('category')}">
+                    <span th:errors="*{category}"></span>
+                </div>
+                <div class="invalid-feedback">Please select a category.</div>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn btn-cancel" onclick="closeExpenseModal()">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button type="submit" id="expenseSubmitBtn" class="btn btn-submit">
+                    <i class="fas fa-plus-circle" id="submitIcon"></i>
+                    <span class="btn-text" id="submitText">Add Expense</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<script th:src="@{/js/transaction.js}" defer></script>
+</body>
+</html>

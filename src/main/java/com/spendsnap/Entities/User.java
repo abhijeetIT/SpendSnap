@@ -1,6 +1,7 @@
 package com.spendsnap.Entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -18,31 +19,44 @@ import jakarta.validation.constraints.*;
 public class User {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @Email
-    @NotBlank
-    @Column(nullable = false, unique = true)
+    @Column(unique = true, nullable = false)
     private String email;
 
     @NotBlank
+    @Valid
+    @Column(nullable = false)
     private String name;
 
     @NotBlank
+    @Column(nullable = false)
     private String password;
 
-    private String profilePictureUrl;
+    private String profilePictureUrl = null;
 
-    @Pattern(regexp = "^[0-9]{10}$", message = "Phone must be 10 digits")
-    private String phoneNumber;
+    private String phoneNumber = null;
 
     private String gender; // MALE, FEMALE, OTHER
 
-    private LocalDate dateOfBirth;
+    private LocalDate dateOfBirth = null;
 
-    private String verificationToken;
+    private String verificationToken = null;
 
     private Boolean isActive = true;
 
     private String role = "USER";
+
+    private LocalDateTime lastLogin;
+
+    private Boolean emailVerified = false;
+
+    private String resetPasswordToken; // For forgot password
+
+    private LocalDateTime resetPasswordTokenExpiry;
+
 
     @CreatedDate
     @Column(updatable = false)
@@ -50,9 +64,6 @@ public class User {
 
     @LastModifiedDate
     private LocalDateTime updatedAt;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Category> categories = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Expense> expenses = new ArrayList<>();
@@ -67,6 +78,10 @@ public class User {
     public User() {
     }
 
+    public Long getId() { return id; }
+
+    public void setId(Long id) {this.id = id;}
+
     public String getRole() { return role; }
 
     public void setRole(String role) { this.role = role; }
@@ -79,6 +94,16 @@ public class User {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public LocalDateTime getCreatedAt() {return createdAt;}
+
+    public void setCreatedAt(LocalDateTime createdAt) {this.createdAt = createdAt;}
+
+    public LocalDateTime getUpdatedAt() {return updatedAt;}
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public String getPassword() {return password;}
@@ -110,10 +135,6 @@ public class User {
 
     public void setActive(Boolean active) {isActive = active;}
 
-    public List<Category> getCategories() {return categories;}
-
-    public void setCategories(List<Category> categories) {this.categories = categories;}
-
     public List<Expense> getExpenses() {return expenses;}
 
     public void setExpenses(List<Expense> expenses) {this.expenses = expenses;}
@@ -126,4 +147,19 @@ public class User {
 
     public void setGoals(List<Goal> goals) { this.goals = goals; }
 
+    public LocalDateTime getLastLogin() { return lastLogin; }
+
+    public void setLastLogin(LocalDateTime lastLogin) { this.lastLogin = lastLogin; }
+
+    public Boolean getEmailVerified() { return emailVerified;}
+
+    public void setEmailVerified(Boolean emailVerified) { this.emailVerified = emailVerified;}
+
+    public String getResetPasswordToken() { return resetPasswordToken; }
+
+    public void setResetPasswordToken(String resetPasswordToken) { this.resetPasswordToken = resetPasswordToken; }
+
+    public LocalDateTime getResetPasswordTokenExpiry() { return resetPasswordTokenExpiry; }
+
+    public void setResetPasswordTokenExpiry(LocalDateTime resetPasswordTokenExpiry) { this.resetPasswordTokenExpiry = resetPasswordTokenExpiry;}
 }

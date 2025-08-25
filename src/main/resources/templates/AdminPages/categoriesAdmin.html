@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Categories • SpendSnap</title>
+    <link rel="icon" th:href="@{/images/spendsnap-logo1.png}" type="image/png">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+          --bg: #0f172a;
+          --panel: #111827;
+          --muted: #94a3b8;
+          --text: #e5e7eb;
+          --accent: #22c55e;
+          --accent-2: #3b82f6;
+          --danger: #ef4444;
+          --warn: #f59e0b;
+          --card: #0b1220;
+          --ring: rgba(59,130,246,0.35);
+          --shadow: 0 10px 25px rgba(0,0,0,.35), 0 2px 6px rgba(0,0,0,.35);
+          --radius: 16px;
+        }
+        * { box-sizing: border-box; }
+        html, body { height: 100%; }
+        body {
+          margin: 0; background: radial-gradient(1200px 800px at 15% 10%, #111827 0%, #0b1220 30%, var(--bg) 65%);
+          color: var(--text); font: 500 15px/1.5 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+        }
+        .container { max-width: 1200px; margin: 32px auto; padding: 0 16px 80px; }
+
+        /* Header */
+        .header {
+          display: flex; align-items: center; justify-content: space-between; gap: 12px;
+          padding: 18px 20px; background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+          border: 1px solid rgba(255,255,255,.06); border-radius: var(--radius); box-shadow: var(--shadow);
+          backdrop-filter: blur(6px);
+        }
+        .brand { display: flex; align-items: center; gap: 12px; }
+        .brand .logo { width: 40px; height: 40px; border-radius: 10px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        .brand .logo img { width: 100%; height: 100%; object-fit: contain; }
+        .brand h1 { font-size: 20px; margin: 0; font-weight: 800; letter-spacing: .4px; }
+        .header .right { display: flex; align-items: center; gap: 10px; }
+
+        /* Grid */
+        .grid { display: grid; gap: 18px; margin-top: 18px; }
+        @media (min-width: 900px) {
+          .grid-2 { grid-template-columns: 1fr 1fr; }
+        }
+
+        /* Cards */
+        .card {
+          background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+          border: 1px solid rgba(255,255,255,.06); border-radius: var(--radius); box-shadow: var(--shadow);
+          padding: 18px;
+        }
+        .card h2 { margin: 0 0 12px; font-size: 16px; font-weight: 800; letter-spacing: .3px; }
+        .card .sub { color: var(--muted); font-size: 13px; margin-top: -4px; margin-bottom: 10px; }
+
+        /* Total box */
+        .total-box {
+          display: flex; align-items: center; justify-content: space-between;
+          padding: 16px; border-radius: 12px; background: #0b1424;
+          border: 1px solid rgba(34,197,94,.2);
+        }
+        .total-box .label { color: var(--muted); font-size: 13px; }
+        .total-box .value { font-size: 24px; font-weight: 900; letter-spacing: .3px; color: var(--accent); }
+
+        /* Table */
+        .table { width: 100%; border-collapse: collapse; }
+        .table th, .table td { text-align: left; padding: 12px; border-bottom: 1px solid rgba(255,255,255,.06); vertical-align: middle; }
+        .table th { font-size: 12px; text-transform: uppercase; letter-spacing: .8px; color: var(--muted); }
+        .table tr:hover td { background: rgba(255,255,255,.02); }
+
+        .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .btn {
+          display: inline-flex; align-items: center; gap: 8px; font-weight: 800; letter-spacing: .3px;
+          padding: 8px 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,.08);
+          background: rgba(255,255,255,.06); text-decoration: none; color: var(--text); cursor: pointer;
+        }
+        .btn:hover { filter: brightness(1.05); box-shadow: 0 0 0 3px var(--ring); }
+        .btn.primary { background: linear-gradient(135deg, #2563eb, #22c55e); }
+        .btn.danger { background: rgba(239,68,68,.25); }
+
+        .row { display: grid; gap: 12px; }
+        @media (min-width: 700px){ .row-2 { grid-template-columns: 1fr 1fr; } }
+        .input {
+          width: 100%; padding: 10px 12px; border-radius: 12px;
+          border: 1px solid rgba(255,255,255,.1); background: #0a1220; color: var(--text);
+        }
+        .help { color: var(--muted); font-size: 12px; }
+
+        .icon {
+          width: 22px; height: 22px; border-radius: 6px; background: rgba(255,255,255,.08);
+          display: inline-flex; align-items: center; justify-content: center; font-size: 12px;
+        }
+
+        /* Category icon styles - UPDATED */
+        .category-icon {
+          width: 32px; /* Increased from 22px */
+          height: 32px; /* Increased from 22px */
+          border-radius: 8px; /* Slightly larger radius */
+          background: rgba(255,255,255,.08);
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .category-icon img {
+          width: 20px; /* Increased from 14px */
+          height: 20px; /* Increased from 14px */
+          object-fit: contain;
+        }
+
+        /* Alert */
+        .alert-container {
+            position: fixed; top: 20px; right: 20px; z-index: 2000; width: 300px;
+        }
+        .alert {
+            padding: 15px; margin-bottom: 10px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            display: flex; align-items: center; gap: 10px; animation: slideIn 0.3s, fadeOut 0.5s 5s forwards;
+        }
+        .alert-success { background: var(--accent); color: white; }
+        .alert-danger { background: var(--danger); color: white; }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes fadeOut {
+            to { opacity: 0; }
+        }
+
+        /* Confirmation Modal */
+        .confirmation-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5); z-index: 3000; display: none;
+            align-items: center; justify-content: center;
+        }
+        .confirmation-modal {
+            background: var(--card); border: 1px solid rgba(255,255,255,.06);
+            border-radius: var(--radius); padding: 24px; max-width: 400px; width: 90%;
+            box-shadow: var(--shadow);
+        }
+        .confirmation-title { font-size: 18px; font-weight: 800; margin: 0 0 8px 0; }
+        .confirmation-message { color: var(--muted); font-size: 14px; margin: 0; }
+        .confirmation-actions {
+            display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px;
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .container { padding: 0 12px 60px; margin: 16px auto; }
+            .header { padding: 12px 16px; flex-direction: column; gap: 16px; }
+            .grid-2 { grid-template-columns: 1fr; }
+            .table { font-size: 13px; }
+            .table th, .table td { padding: 8px 6px; }
+            /* Slightly smaller icons on mobile */
+            .category-icon {
+                width: 28px;
+                height: 28px;
+            }
+            .category-icon img {
+                width: 16px;
+                height: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Alert Container -->
+<div class="alert-container">
+    <div th:if="${alertMessage}"
+         th:classappend="'alert-' + ${alertType}"
+         class="alert" role="alert">
+        <i th:class="${alertType == 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle'}"></i>
+        <span th:text="${alertMessage}"></span>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div id="confirmationOverlay" class="confirmation-overlay">
+    <div class="confirmation-modal">
+        <h3 id="confirmationTitle" class="confirmation-title">Confirm Action</h3>
+        <p id="confirmationMessage" class="confirmation-message">Are you sure you want to proceed?</p>
+        <div class="confirmation-actions">
+            <button class="btn" onclick="closeConfirmation()">Cancel</button>
+            <button id="confirmBtn" class="btn danger">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <div class="brand">
+            <div class="logo">
+                <img th:src="@{/images/spendsnap-logo1.png}" alt="SpendSnap Logo" />
+            </div>
+            <div>
+                <h1>Categories Management</h1>
+            </div>
+        </div>
+        <div class="right">
+            <a class="btn" th:href="@{/adminSpendSnap/dashboard}">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+        </div>
+    </div>
+
+    <!-- Total Categories Box -->
+    <div class="card" style="margin-top: 18px;">
+        <div class="total-box">
+            <div>
+                <div class="label">Total Categories</div>
+                <div class="value" th:text="${totalCategories != null ? totalCategories : 0}">0</div>
+            </div>
+            <i class="fas fa-tags" style="font-size: 2rem; color: var(--accent); opacity: 0.3;"></i>
+        </div>
+    </div>
+
+    <div class="grid grid-2">
+        <!-- Add Category Form -->
+        <div class="card">
+            <h2><i class="fas fa-plus"></i> Add New Category</h2>
+            <div class="sub">Create a new expense category.</div>
+
+            <form th:action="@{/adminSpendSnap/categories-add}" method="post" enctype="multipart/form-data" style="margin-top:16px; display:grid; gap:12px;">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <input type="hidden" name="type" value="EXPENSE" />
+
+                <div>
+                    <label style="color: var(--muted); font-size: 12px; margin-bottom: 6px; display: block;">Category Name</label>
+                    <input class="input" type="text" name="name" placeholder="e.g., Groceries, Transportation" required />
+                </div>
+
+                <div class="row row-2">
+                    <div>
+                        <label style="color: var(--muted); font-size: 12px; margin-bottom: 6px; display: block;">
+                            Upload Icon
+                        </label>
+                        <input class="input" type="file" name="iconFile" accept="image/*" />
+                    </div>
+                </div>
+
+                <button class="btn primary" type="submit">
+                    <i class="fas fa-plus"></i> Add Category
+                </button>
+            </form>
+        </div>
+
+        <!-- Categories List -->
+        <div class="card">
+            <h2><i class="fas fa-list"></i> Existing Categories</h2>
+            <div class="sub">Manage your existing categories.</div>
+
+            <div style="margin-top:16px; overflow:auto; border-radius:12px; border:1px solid rgba(255,255,255,.06);">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Icon</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="c : ${categories}">
+                        <td>
+                            <div style="font-weight: 600;" th:text="${c.name}">Category Name</div>
+                            <div style="font-size: 11px; color: var(--muted);" th:text="'ID: ' + ${c.id}">ID: 1</div>
+                        </td>
+                        <td>
+                            <div class="category-icon">
+                                <img th:if="${c.icon != null and c.icon != ''}"
+                                     th:src="${c.icon}"
+                                     alt="Category Icon" />
+                                <i th:if="${c.icon == null or c.icon == ''}" class="fas fa-tag"></i>
+                            </div>
+                        </td>
+                        <td>
+                            <button class="btn danger delete-category-btn"
+                                    th:data-id="${c.id}"
+                                    th:data-name="${c.name}">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </td>
+                    </tr>
+                    <tr th:if="${categories == null or #lists.isEmpty(categories)}">
+                        <td colspan="3" style="color:var(--muted); text-align:center; padding:40px;">
+                            <i class="fas fa-tags" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
+                            No categories created yet.
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    let currentId = null;
+
+    // Add event listeners to all delete buttons
+    document.addEventListener('DOMContentLoaded', function() {
+        const deleteButtons = document.querySelectorAll('.delete-category-btn');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const id = this.getAttribute('data-id');
+                const name = this.getAttribute('data-name');
+                confirmDelete(id, name);
+            });
+        });
+
+        // Auto-hide alerts
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            setTimeout(() => {
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 500);
+            }, 5000);
+        });
+    });
+
+    function confirmDelete(id, name) {
+        currentId = id;
+
+        document.getElementById('confirmationTitle').textContent = 'Delete Category';
+        document.getElementById('confirmationMessage').textContent = `Are you sure you want to delete "${name}"? This action cannot be undone.`;
+        document.getElementById('confirmationOverlay').style.display = 'flex';
+    }
+
+    function closeConfirmation() {
+        document.getElementById('confirmationOverlay').style.display = 'none';
+        currentId = null;
+    }
+
+    function executeDelete() {
+        if (!currentId) return;
+
+        let form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/adminSpendSnap/categories/${currentId}`;
+        form.style.display = 'none';
+
+        // Add CSRF token
+        let csrfToken = document.querySelector('input[name="_csrf"]')?.value;
+        if (csrfToken) {
+            let csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = '_csrf';
+            csrfInput.value = csrfToken;
+            form.appendChild(csrfInput);
+        }
+
+        let methodInput = document.createElement('input');
+        methodInput.type = 'hidden';
+        methodInput.name = '_method';
+        methodInput.value = 'delete';
+        form.appendChild(methodInput);
+
+        document.body.appendChild(form);
+        form.submit();
+
+        closeConfirmation();
+    }
+
+    // Set up confirm button
+    document.getElementById('confirmBtn').addEventListener('click', executeDelete);
+</script>
+</body>
+</html>

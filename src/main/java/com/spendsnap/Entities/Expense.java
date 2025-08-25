@@ -28,7 +28,7 @@ public class Expense {
     private Category category;
 
     @ManyToOne
-    @JoinColumn(name = "user_email", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @CreatedDate
@@ -67,6 +67,14 @@ public class Expense {
 
     public void setDate(LocalDate date) {
         this.date = date;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Category getCategory() {
