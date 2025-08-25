@@ -1,2 +1,1 @@
-git add Procfile
-git commit -m "Add Procfile for Railway deployment"
+web: java -jar target/spendsnap-0.0.1-SNAPSHOT.jar
