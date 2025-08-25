@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - SpendSnap</title>
+    <link rel="icon" th:href="@{/images/spendsnap-logo1.png}" type="image/png">
+    <meta name="theme-color" content="#ff6b6b">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        .header {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo img {
+            height: 40px;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 25px;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: #ffe6e6;
+        }
+
+        .nav-auth {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 8px 18px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-login {
+            background: transparent;
+            border: 2px solid white;
+            color: white;
+        }
+
+        .btn-login:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-signup {
+            background: white;
+            color: #ff6b6b;
+            border: 2px solid white;
+        }
+
+        .btn-signup:hover {
+            background: #ffe6e6;
+            border-color: #ffe6e6;
+        }
+
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        /* Privacy Content */
+        .privacy-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.06);
+        }
+
+        .privacy-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .privacy-header h1 {
+            color: #ff6b6b;
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .privacy-header p {
+            color: #777;
+            font-size: 1.1rem;
+        }
+
+        .privacy-content {
+            padding: 20px 0;
+        }
+
+        .privacy-section {
+            margin-bottom: 30px;
+        }
+
+        .privacy-section h2 {
+            color: #ff6b6b;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #ffe6e6;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .privacy-section p {
+            margin-bottom: 15px;
+            color: #444;
+        }
+
+        .privacy-section ul {
+            margin-left: 25px;
+            margin-bottom: 20px;
+        }
+
+        .privacy-section li {
+            margin-bottom: 10px;
+        }
+
+        .security-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #4CAF50, #2E7D32);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .highlight-box {
+            background-color: #fff5f5;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #ff6b6b;
+            margin: 20px 0;
+        }
+
+        .last-updated {
+            text-align: center;
+            color: #777;
+            font-style: italic;
+            margin-top: 40px;
+        }
+
+        /* Footer Styles */
+        .footer {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 50px 0 20px;
+            margin-top: 50px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .footer-section h4 {
+            color: #ff6b6b;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 12px;
+        }
+
+        .footer-section a {
+            color: #ecf0f1;
+            text-decoration: none;
+            transition: color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .footer-section a:hover {
+            color: #ff6b6b;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .footer-logo img {
+            height: 35px;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .privacy-container {
+                padding: 20px;
+                margin: 20px;
+            }
+
+            .privacy-header h1 {
+                font-size: 2rem;
+            }
+
+            .privacy-section h2 {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Header -->
+<header class="header">
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-container">
+                <!-- Logo -->
+                <a th:href="@{/}" class="nav-logo">
+                    <img th:src="@{/images/spendsnap-logo.png}" alt="SpendSnap Logo">
+                </a>
+
+                <!-- Navigation Menu -->
+                <div class="nav-menu">
+                    <a th:href="@{/}" class="nav-link">Home</a>
+                    <a th:href="@{/#features}" class="nav-link">Features</a>
+                    <a th:href="@{/#about}" class="nav-link">About</a>
+                    <a th:href="@{/#contact}" class="nav-link">Contact</a>
+                </div>
+
+                <!-- Auth Buttons -->
+                <div class="nav-auth">
+                    <a th:href="@{/signIn}" class="btn btn-login">
+                        <i class="fas fa-sign-in-alt"></i> Sign In
+                    </a>
+                    <a th:href="@{/signUp}" class="btn btn-signup">
+                        <i class="fas fa-user-plus"></i> Sign Up
+                    </a>
+                </div>
+
+                <!-- Mobile Menu Toggle -->
+                <button class="mobile-menu-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<!-- Privacy Policy Content -->
+<div class="container">
+    <div class="privacy-container">
+        <div class="privacy-header">
+            <h1>Privacy Policy</h1>
+            <p>Your privacy is important to us. This policy explains how we handle your information.</p>
+        </div>
+
+        <div class="privacy-content">
+            <div class="privacy-section">
+                <h2>
+                    <i class="fas fa-info-circle"></i> Information We Collect
+                    <span class="security-badge">Minimal Data</span>
+                </h2>
+                <p>SpendSnap is a student project designed to help you track expenses. We only collect essential information:</p>
+                <ul>
+                    <li>Account details (email and password)</li>
+                    <li>Expense information you enter</li>
+                    <li>Basic usage statistics to improve the service</li>
+                </ul>
+                <div class="highlight-box">
+                    <p><strong>Note:</strong> We do not collect sensitive financial information like bank account numbers or credit card details.</p>
+                </div>
+            </div>
+
+            <div class="privacy-section">
+                <h2>
+                    <i class="fas fa-shield-alt"></i> Data Security
+                    <span class="security-badge">Spring Boot Security</span>
+                </h2>
+                <p>We take your privacy seriously and implement strong security measures:</p>
+                <ul>
+                    <li>All passwords are encrypted using BCrypt encryption</li>
+                    <li>Spring Security framework protects against common vulnerabilities</li>
+                    <li>Data is stored securely with protection against SQL injection attacks</li>
+                    <li>Regular security updates and monitoring</li>
+                </ul>
+            </div>
+
+            <div class="privacy-section">
+                <h2>
+                    <i class="fas fa-ban"></i> No Third-Party Sharing
+                    <span class="security-badge">Student Project</span>
+                </h2>
+                <p>Since this is a student project and not a commercial application:</p>
+                <ul>
+                    <li>We do not share your data with any third parties</li>
+                    <li>We do not sell your personal information</li>
+                    <li>We do not use your data for advertising purposes</li>
+                </ul>
+                <p>Your expense data is only used to provide the tracking functionality within the app.</p>
+            </div>
+
+            <div class="privacy-section">
+                <h2>
+                    <i class="fas fa-database"></i> Data Retention
+                </h2>
+                <p>Your data is stored for as long as your account remains active. You can:</p>
+                <ul>
+                    <li>View all your stored information through the app interface</li>
+                    <li>Export your expense data at any time</li>
+                    <li>Delete your account and all associated data permanently</li>
+                </ul>
+            </div>
+
+            <div class="privacy-section">
+                <h2>
+                    <i class="fas fa-graduation-cap"></i> Educational Purpose
+                </h2>
+                <p>Please remember that SpendSnap is a student project created for educational purposes:</p>
+                <ul>
+                    <li>It demonstrates web development skills using Spring Boot</li>
+                    <li>It showcases modern security practices</li>
+                    <li>It's not intended for commercial use</li>
+                </ul>
+                <div class="highlight-box">
+                    <p><strong>While we implement strong security measures,</strong> please avoid entering highly sensitive information as this is a student project environment.</p>
+                </div>
+            </div>
+
+            <div class="last-updated">
+                <p>This Privacy Policy was last updated on January 1, 2025.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <div class="footer-logo">
+                    <img th:src="@{/images/spendsnap-logo.png}" alt="SpendSnap Logo">
+                    <span>SpendSnap</span>
+                </div>
+                <p>
+                    A modern expense tracker built with care for students and professionals who want to take control of their finances.
+                </p>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a th:href="@{/}"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a th:href="@{/#features}"><i class="fas fa-star"></i> Features</a></li>
+                    <li><a th:href="@{/signIn}"><i class="fas fa-sign-in-alt"></i> Sign In</a></li>
+                    <li><a th:href="@{/signUp}"><i class="fas fa-user-plus"></i> Sign Up</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="#"><i class="fas fa-question-circle"></i> Help Center</a></li>
+                    <li><a th:href="@{/privacy}"><i class="fas fa-shield-alt"></i> Privacy Policy</a></li>
+                    <li><a th:href="@{/terms}"><i class="fas fa-file-contract"></i> Terms of Service</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Contact</h4>
+                <ul>
+                    <li><a href="mailto:abhijeetj9433@gmail.com"><i class="fas fa-envelope"></i> contact@spendsnap.com</a></li>
+                    <li><a href="#" id="developerLink"><i class="fas fa-laptop-code"></i> Computer Science Dept</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>
+                &copy; 2025 SpendSnap.in . All rights reserved.
+            </p>
+        </div>
+    </div>
+</footer>
+
+<script>
+    // Mobile menu toggle functionality
+    const mobileToggle = document.querySelector('.mobile-menu-toggle');
+    const navMenu = document.querySelector('.nav-menu');
+
+    if (mobileToggle && navMenu) {
+        mobileToggle.addEventListener('click', function() {
+            navMenu.classList.toggle('active');
+            if (navMenu.classList.contains('active')) {
+                navMenu.style.display = 'flex';
+                navMenu.style.flexDirection = 'column';
+                navMenu.style.position = 'absolute';
+                navMenu.style.top = '100%';
+                navMenu.style.left = '0';
+                navMenu.style.right = '0';
+                navMenu.style.background = 'linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%)';
+                navMenu.style.padding = '20px';
+                navMenu.style.gap = '15px';
+            } else {
+                navMenu.style.display = 'none';
+            }
+        });
+    }
+
+    // Adjust menu for window resize
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768) {
+            navMenu.style.display = 'flex';
+            navMenu.style.flexDirection = 'row';
+            navMenu.style.position = 'static';
+            navMenu.style.background = 'transparent';
+            navMenu.style.padding = '0';
+        } else {
+            if (!navMenu.classList.contains('active')) {
+                navMenu.style.display = 'none';
+            } else {
+                navMenu.style.display = 'flex';
+                navMenu.style.flexDirection = 'column';
+                navMenu.style.position = 'absolute';
+                navMenu.style.top = '100%';
+                navMenu.style.left = '0';
+                navMenu.style.right = '0';
+                navMenu.style.background = 'linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%)';
+                navMenu.style.padding = '20px';
+                navMenu.style.gap = '15px';
+            }
+        }
+    });
+</script>
+</body>
+</html>

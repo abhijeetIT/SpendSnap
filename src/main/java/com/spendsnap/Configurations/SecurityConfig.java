@@ -28,14 +28,14 @@ public class SecurityConfig {
                         // Public paths
                         .requestMatchers(
                                 "/",
-                                "/test",
+                                "/terms",
+                                "/privacy",
                                 "/error",
                                 "/signIn",
                                 "/signUp",
                                 "/css/**",
                                 "/js/**",
                                 "/images/**",
-                                "/icons/**",
                                 "/favicon.ico"
                         ).permitAll()
                         // Protected paths

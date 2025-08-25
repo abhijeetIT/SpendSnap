@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms and Conditions - SpendSnap</title>
+    <link rel="icon" th:href="@{/images/spendsnap-logo1.png}" type="image/png">
+    <meta name="theme-color" content="#ff6b6b">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        .header {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo img {
+            height: 40px;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 25px;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: #ffe6e6;
+        }
+
+        .nav-auth {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 8px 18px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-login {
+            background: transparent;
+            border: 2px solid white;
+            color: white;
+        }
+
+        .btn-login:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-signup {
+            background: white;
+            color: #ff6b6b;
+            border: 2px solid white;
+        }
+
+        .btn-signup:hover {
+            background: #ffe6e6;
+            border-color: #ffe6e6;
+        }
+
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        /* Terms Content */
+        .terms-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.06);
+        }
+
+        .terms-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .terms-header h1 {
+            color: #ff6b6b;
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .terms-header p {
+            color: #777;
+            font-size: 1.1rem;
+        }
+
+        .terms-content {
+            padding: 20px 0;
+        }
+
+        .terms-section {
+            margin-bottom: 30px;
+        }
+
+        .terms-section h2 {
+            color: #ff6b6b;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #ffe6e6;
+        }
+
+        .terms-section p {
+            margin-bottom: 15px;
+            color: #444;
+        }
+
+        .terms-section ul {
+            margin-left: 25px;
+            margin-bottom: 20px;
+        }
+
+        .terms-section li {
+            margin-bottom: 10px;
+        }
+
+        .highlight {
+            background-color: #fff5f5;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #ff6b6b;
+            margin: 20px 0;
+        }
+
+        .last-updated {
+            text-align: center;
+            color: #777;
+            font-style: italic;
+            margin-top: 40px;
+        }
+
+        /* Footer Styles */
+        .footer {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 50px 0 20px;
+            margin-top: 50px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .footer-section h4 {
+            color: #ff6b6b;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 12px;
+        }
+
+        .footer-section a {
+            color: #ecf0f1;
+            text-decoration: none;
+            transition: color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .footer-section a:hover {
+            color: #ff6b6b;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .footer-logo img {
+            height: 35px;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .terms-container {
+                padding: 20px;
+                margin: 20px;
+            }
+
+            .terms-header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Header -->
+<header class="header">
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-container">
+                <!-- Logo -->
+                <a th:href="@{/}" class="nav-logo">
+                    <img th:src="@{/images/spendsnap-logo.png}" alt="SpendSnap Logo">
+                </a>
+
+                <!-- Navigation Menu -->
+                <div class="nav-menu">
+                    <a th:href="@{/}" class="nav-link">Home</a>
+                    <a th:href="@{/#features}" class="nav-link">Features</a>
+                    <a th:href="@{/#about}" class="nav-link">About</a>
+                    <a th:href="@{/#contact}" class="nav-link">Contact</a>
+                </div>
+
+                <!-- Auth Buttons -->
+                <div class="nav-auth">
+                    <a th:href="@{/signIn}" class="btn btn-login">
+                        <i class="fas fa-sign-in-alt"></i> Sign In
+                    </a>
+                    <a th:href="@{/signUp}" class="btn btn-signup">
+                        <i class="fas fa-user-plus"></i> Sign Up
+                    </a>
+                </div>
+
+                <!-- Mobile Menu Toggle -->
+                <button class="mobile-menu-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<!-- Terms and Conditions Content -->
+<div class="container">
+    <div class="terms-container">
+        <div class="terms-header">
+            <h1>Terms and Conditions</h1>
+            <p>Last Updated: January 1, 2025</p>
+        </div>
+
+        <div class="terms-content">
+            <div class="terms-section">
+                <h2>1. Acceptance of Terms</h2>
+                <p>By accessing or using SpendSnap ("the Service"), you agree to be bound by these Terms and Conditions ("Terms"). If you disagree with any part of the terms, you may not access the Service.</p>
+            </div>
+
+            <div class="terms-section">
+                <h2>2. Description of Service</h2>
+                <p>SpendSnap is a web-based expense tracking application that allows users to:</p>
+                <ul>
+                    <li>Record and categorize expenses</li>
+                    <li>Generate spending reports and analytics</li>
+                    <li>Set budgeting goals and financial targets</li>
+                    <li>Sync data across multiple devices</li>
+                </ul>
+            </div>
+
+            <div class="terms-section">
+                <h2>3. User Accounts</h2>
+                <p>When you create an account with us, you must provide accurate, complete, and current information. You are responsible for:</p>
+                <ul>
+                    <li>Maintaining the confidentiality of your account credentials</li>
+                    <li>All activities that occur under your account</li>
+                    <li>Notifying us immediately of any unauthorized use of your account</li>
+                </ul>
+                <p>We reserve the right to refuse service, terminate accounts, or remove content at our discretion.</p>
+            </div>
+
+            <div class="terms-section">
+                <h2>4. User Responsibilities</h2>
+                <p>You agree to use the Service only for lawful purposes and in a way that does not infringe the rights of, restrict, or inhibit anyone else's use and enjoyment of the Service.</p>
+                <p>Prohibited behavior includes:</p>
+                <ul>
+                    <li>Harassing or causing distress or inconvenience to any other user</li>
+                    <li>Transmitting obscene or offensive content</li>
+                    <li>Disrupting the normal flow of dialogue within our Service</li>
+                </ul>
+            </div>
+
+            <div class="terms-section">
+                <h2>5. Financial Information</h2>
+                <p>SpendSnap allows you to input financial information for tracking and analysis purposes. We treat this information with the utmost security and confidentiality.</p>
+                <p>However, you acknowledge that:</p>
+                <ul>
+                    <li>SpendSnap is not a financial advisory service</li>
+                    <li>We do not guarantee the accuracy of financial calculations or predictions</li>
+                    <li>You are solely responsible for financial decisions based on information provided by the Service</li>
+                </ul>
+            </div>
+
+            <div class="terms-section">
+                <h2>6. Privacy Policy</h2>
+                <p>Your use of the Service is also governed by our Privacy Policy, which can be accessed at <a th:href="@{/privacy}">Privacy Policy</a>. Please review this policy to understand our practices regarding your personal information.</p>
+            </div>
+
+            <div class="terms-section">
+                <h2>7. Intellectual Property</h2>
+                <p>The Service and its original content, features, and functionality are owned by SpendSnap and are protected by international copyright, trademark, patent, trade secret, and other intellectual property laws.</p>
+                <p>You may not copy, modify, create derivative works of, reverse engineer, or attempt to extract the source code of the Service without our express permission.</p>
+            </div>
+
+            <div class="terms-section">
+                <h2>8. Termination</h2>
+                <p>We may terminate or suspend your account immediately, without prior notice or liability, for any reason whatsoever, including without limitation if you breach the Terms.</p>
+                <p>Upon termination, your right to use the Service will immediately cease. If you wish to terminate your account, you may simply discontinue using the Service.</p>
+            </div>
+
+            <div class="terms-section">
+                <h2>9. Limitation of Liability</h2>
+                <p>In no event shall SpendSnap, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from:</p>
+                <ul>
+                    <li>Your access to or use of or inability to access or use the Service</li>
+                    <li>Any conduct or content of any third party on the Service</li>
+                    <li>Any unauthorized access to or use of our servers and/or any personal information stored therein</li>
+                </ul>
+            </div>
+
+            <div class="terms-section">
+                <h2>10. Changes to Terms</h2>
+                <p>We reserve the right, at our sole discretion, to modify or replace these Terms at any time. If a revision is material, we will provide at least 30 days' notice prior to any new terms taking effect.</p>
+                <p>What constitutes a material change will be determined at our sole discretion. By continuing to access or use our Service after those revisions become effective, you agree to be bound by the revised terms.</p>
+            </div>
+
+            <div class="terms-section">
+                <h2>11. Governing Law</h2>
+                <p>These Terms shall be governed and construed in accordance with the laws of India, without regard to its conflict of law provisions.</p>
+                <p>Our failure to enforce any right or provision of these Terms will not be considered a waiver of those rights.</p>
+            </div>
+
+            <div class="terms-section">
+                <h2>12. Contact Information</h2>
+                <p>If you have any questions about these Terms, please contact us at:</p>
+                <div class="highlight">
+                    <p><strong>Email:</strong> <a href="mailto:abhijeetj9433@gamil.com">contact@spendsnap.com</a></p>
+                </div>
+            </div>
+
+            <div class="last-updated">
+                <p>These Terms and Conditions were last updated on January 1, 2025.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <div class="footer-logo">
+                    <img th:src="@{/images/spendsnap-logo.png}" alt="SpendSnap Logo">
+                    <span>SpendSnap</span>
+                </div>
+                <p>
+                    A modern expense tracker built with care for students and professionals who want to take control of their finances.
+                </p>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a th:href="@{/}"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a th:href="@{/#features}"><i class="fas fa-star"></i> Features</a></li>
+                    <li><a th:href="@{/signIn}"><i class="fas fa-sign-in-alt"></i> Sign In</a></li>
+                    <li><a th:href="@{/signUp}"><i class="fas fa-user-plus"></i> Sign Up</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="#"><i class="fas fa-question-circle"></i> Help Center</a></li>
+                    <li><a th:href="@{/privacy}"><i class="fas fa-shield-alt"></i> Privacy Policy</a></li>
+                    <li><a th:href="@{/terms}"><i class="fas fa-file-contract"></i> Terms of Service</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Contact</h4>
+                <ul>
+                    <li><a href="mailto:abhijeetj9433@gmail.com"><i class="fas fa-envelope"></i> contact@spendsnap.com</a></li>
+                    <li><a href="#" id="developerLink"><i class="fas fa-laptop-code"></i> Computer Science Dept</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>
+                &copy; 2025 SpendSnap.in . All rights reserved.
+            </p>
+        </div>
+    </div>
+</footer>
+
+<script>
+    // Mobile menu toggle functionality
+    const mobileToggle = document.querySelector('.mobile-menu-toggle');
+    const navMenu = document.querySelector('.nav-menu');
+
+    if (mobileToggle && navMenu) {
+        mobileToggle.addEventListener('click', function() {
+            navMenu.classList.toggle('active');
+            if (navMenu.classList.contains('active')) {
+                navMenu.style.display = 'flex';
+                navMenu.style.flexDirection = 'column';
+                navMenu.style.position = 'absolute';
+                navMenu.style.top = '100%';
+                navMenu.style.left = '0';
+                navMenu.style.right = '0';
+                navMenu.style.background = 'linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%)';
+                navMenu.style.padding = '20px';
+                navMenu.style.gap = '15px';
+            } else {
+                navMenu.style.display = 'none';
+            }
+        });
+    }
+
+    // Adjust menu for window resize
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768) {
+            navMenu.style.display = 'flex';
+            navMenu.style.flexDirection = 'row';
+            navMenu.style.position = 'static';
+            navMenu.style.background = 'transparent';
+            navMenu.style.padding = '0';
+        } else {
+            if (!navMenu.classList.contains('active')) {
+                navMenu.style.display = 'none';
+            } else {
+                navMenu.style.display = 'flex';
+                navMenu.style.flexDirection = 'column';
+                navMenu.style.position = 'absolute';
+                navMenu.style.top = '100%';
+                navMenu.style.left = '0';
+                navMenu.style.right = '0';
+                navMenu.style.background = 'linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%)';
+                navMenu.style.padding = '20px';
+                navMenu.style.gap = '15px';
+            }
+        }
+    });
+</script>
+</body>
+</html>

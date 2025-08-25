@@ -754,7 +754,16 @@
                 padding: 6px 10px;
                 min-width: 40px;
                 justify-content: center;
+                margin-bottom: 100px; /* Add this line to push it up */
+
             }
+
+            @media (max-width: 992px) {
+                  .sidebar-logout {
+                  margin-bottom: 30px; /* Less margin on mobile */
+            }
+}
+
         }
 
         @media (max-width: 576px) {

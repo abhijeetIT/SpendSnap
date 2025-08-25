@@ -59,5 +59,16 @@ public class HomeController {
         model.addAttribute("category", category);
         return "test";
     }
+
+    @GetMapping("/terms")
+    public String terms(){
+        return "TermsofService";
+    }
+
+    @GetMapping("/privacy")
+    public String privacyPage(){
+        return "privacy";
+    }
+
 }
 
