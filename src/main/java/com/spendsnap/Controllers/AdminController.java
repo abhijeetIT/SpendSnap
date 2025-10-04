@@ -19,7 +19,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.List;
 
 @Controller
-@RequestMapping("/adminSpendSnap")
+@RequestMapping("/admin")
 @PreAuthorize("ADMIN")
 public class AdminController {
 
