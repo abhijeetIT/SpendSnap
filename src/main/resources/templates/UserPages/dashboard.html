@@ -910,7 +910,7 @@
     <!-- Main Content -->
     <main class="main-content">
         <!-- Dynamic greeting with user's first name -->
-        <h1 class="greeting">Welcome back, <span th:text="${#strings.substringBefore(user.name, ' ') ?: user.name}">?</span>!</h1>
+        <h1 class="greeting">Welcome, <span th:text="${#strings.substringBefore(user.name, ' ') ?: user.name}">?</span>!</h1>
 
         <!-- Single Expense Card -->
         <div class="expense-card-container">
