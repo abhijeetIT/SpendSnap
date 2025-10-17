@@ -59,9 +59,9 @@ It allows users to record, categorize, and visualize their spending — all from
 
 📧 Email: abhijeetj4324@gmail.com
 
-💼 LinkedIn: Abhijeet Jha
+💼 LinkedIn: https://www.linkedin.com/in/abhijeet-jha19
 
 🌍 GitHub: @abhijeetIT
 
-📸 Instagram: @_abhijeet_jha
+📸 Instagram: @_abhijeet_jha_
 
