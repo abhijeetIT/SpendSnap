@@ -49,6 +49,19 @@ It allows users to record, categorize, and visualize their spending — all from
 | 🧰 **Build Tool** | Maven |
 
 ---
+🧑‍💻 Developer
 
-## 🏗️ Project Architecture  
+👨‍💻 Name: Abhijeet Jha
+🎓 Course: BCA (3rd Semester)
+💼 Aspiration: Backend Developer | Java & Spring Boot Enthusiast
+
+🌐 Connect With Me
+
+📧 Email: abhijeetj4324@gmail.com
+
+💼 LinkedIn: Abhijeet Jha
+
+🌍 GitHub: @abhijeetIT
+
+📸 Instagram: @_abhijeet_jha
 
