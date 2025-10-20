@@ -267,10 +267,10 @@
 
     <!-- Navigation -->
     <div class="nav">
-        <a th:href="@{/adminSpendSnap/dashboard}" class="nav-item active">
+        <a th:href="@{/admin/dashboard}" class="nav-item active">
             <i class="fas fa-tachometer-alt"></i> Dashboard
         </a>
-        <a th:href="@{/adminSpendSnap/categories}" class="nav-item">
+        <a th:href="@{/admin/categories}" class="nav-item">
             <i class="fas fa-tags"></i> Categories
         </a>
     </div>
@@ -312,7 +312,7 @@
         <div class="card" style="margin-top: 18px;">
             <div class="section-title">
                 <h2><i class="fas fa-users-cog"></i> Users Management</h2>
-                <form class="searchbar" th:action="@{/adminSpendSnap/users}" method="get">
+                <form class="searchbar" th:action="@{/admin/users}" method="get">
                     <input class="input" type="text" name="q" placeholder="Search by name or email" th:value="${param.q}" />
                     <button class="btn primary" type="submit"><i class="fas fa-search"></i> Search</button>
                 </form>
@@ -407,10 +407,10 @@
                     Showing page <span th:text="${pageNumber + 1}">1</span> of <span th:text="${totalPages}">1</span>
                 </div>
                 <div class="actions">
-                    <a class="btn" th:href="@{/adminSpendSnap/dashboard(page=${pageNumber - 1}, q=${param.q})}" th:if="${pageNumber > 0}">
+                    <a class="btn" th:href="@{/admin/dashboard(page=${pageNumber - 1}, q=${param.q})}" th:if="${pageNumber > 0}">
                         <i class="fas fa-chevron-left"></i> Previous
                     </a>
-                    <a class="btn" th:href="@{/adminSpendSnap/dashboard(page=${pageNumber + 1}, q=${param.q})}" th:if="${pageNumber + 1 < totalPages}">
+                    <a class="btn" th:href="@{/admin/dashboard(page=${pageNumber + 1}, q=${param.q})}" th:if="${pageNumber + 1 < totalPages}">
                         Next <i class="fas fa-chevron-right"></i>
                     </a>
                 </div>
@@ -477,9 +477,9 @@
         };
 
         if (currentAction === 'toggle-active') {
-            url = `/adminSpendSnap/users/${currentId}/toggle-active`;
+            url = `/admin/users/${currentId}/toggle-active`;
         } else if (currentAction === 'role') {
-            url = `/adminSpendSnap/users/${currentId}/role`;
+            url = `/admin/users/${currentId}/role`;
             const actionName = document.getElementById('confirmationTitle').textContent;
             const roleValue = actionName.includes('Remove Admin') ? 'USER' : 'ADMIN';
             options.body = `role=${roleValue}`;
