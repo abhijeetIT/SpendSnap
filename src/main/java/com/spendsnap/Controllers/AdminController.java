@@ -65,7 +65,7 @@ public class AdminController {
             model.addAttribute("alertMessage", "Something went wrong.!");
             model.addAttribute("alertType", "danger");
         }
-        return "redirect:/adminSpendSnap/dashboard";
+        return "redirect:/admin/dashboard";
     }
 
     // Toggle role
@@ -78,7 +78,7 @@ public class AdminController {
             model.addAttribute("alertMessage", "Something went wrong.!");
             model.addAttribute("alertType", "danger");
         }
-        return "redirect:/adminSpendSnap/dashboard";
+        return "redirect:/admin/dashboard";
     }
 
 
@@ -112,12 +112,12 @@ public class AdminController {
 
             redirectAttributes.addFlashAttribute("alertMessage", "Category created successfully");
             redirectAttributes.addFlashAttribute("alertType", "success");
-            return "redirect:/adminSpendSnap/categories";
+            return "redirect:/admin/categories";
 
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("alertMessage", "Error creating category: " + e.getMessage());
             redirectAttributes.addFlashAttribute("alertType", "danger");
-            return "redirect:/adminSpendSnap/categories";
+            return "redirect:/admin/categories";
         }
     }
 
@@ -135,23 +135,23 @@ public class AdminController {
                 redirectAttributes.addFlashAttribute("alertMessage",
                         "Cannot delete category: It is being used in " + usageCount + " expense(s)");
                 redirectAttributes.addFlashAttribute("alertType", "warning");
-                return "redirect:/adminSpendSnap/categories";
+                return "redirect:/admin/categories";
             }
 
             categoryService.delete(categoryId);
             redirectAttributes.addFlashAttribute("alertMessage", "Category deleted successfully");
             redirectAttributes.addFlashAttribute("alertType", "success");
-            return "redirect:/adminSpendSnap/categories";
+            return "redirect:/admin/categories";
 
         } catch (DataIntegrityViolationException e) {
             redirectAttributes.addFlashAttribute("alertMessage",
                     "Cannot delete category: It is being used in other records");
             redirectAttributes.addFlashAttribute("alertType", "danger");
-            return "redirect:/adminSpendSnap/categories";
+            return "redirect:/admin/categories";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("alertMessage", "Error deleting category: " + e.getMessage());
             redirectAttributes.addFlashAttribute("alertType", "danger");
-            return "redirect:/adminSpendSnap/categories";
+            return "redirect:/admin/categories";
         }
     }
 }
