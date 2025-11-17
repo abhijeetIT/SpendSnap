@@ -1,25 +1,23 @@
-# Use Maven + Java to build the app
+# Build stage
 FROM maven:3.9.1-eclipse-temurin-17 AS build
 
 WORKDIR /app
 
-# Copy the source code
 COPY pom.xml .
 COPY src ./src
 
-# Build the Spring Boot JAR
 RUN mvn clean package -DskipTests
 
-# Use slim Java runtime for running
-FROM openjdk:17-jdk-slim
+# Runtime stage
+FROM eclipse-temurin:17-jdk
 
 WORKDIR /app
 
-# Copy the built JAR from the previous stage
 COPY --from=build /app/target/spendsnap-0.0.1-SNAPSHOT.jar app.jar
 
-# Expose the port
-EXPOSE 8081
+# Render dynamically assigns PORT
+ENV PORT=8080
 
-# Run the app
-ENTRYPOINT ["java","-jar","app.jar"]
+EXPOSE 8080
+
+ENTRYPOINT ["sh", "-c", "java -jar app.jar --server.port=$PORT"]
