@@ -85,7 +85,7 @@
                             Remember me
                         </label>
                     </div>
-                    <a href="#" class="forgot-password">Forgot password?</a>
+                    <a th:href="@{/auth/forgot-password}" class="forgot-password">Forgot password?</a>
                 </div>
 
                 <!-- Login Button -->
@@ -95,7 +95,7 @@
 
                 <!-- Signup Link -->
                 <div class="signup-link">
-                    Don't have an account? <a th:href="@{/signUp}">Create one here</a>
+                    Don't have an account? <a th:href="@{/auth/signUp}">Create one here</a>
                 </div>
             </form>
         </div>

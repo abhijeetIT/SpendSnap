@@ -21,10 +21,10 @@ import java.util.*;
 
 @Controller
 @RequestMapping("/user")
-public class UserControllers {
+public class UserRoot {
 
 
-    private static final Logger log = LoggerFactory.getLogger(UserControllers.class);
+    private static final Logger log = LoggerFactory.getLogger(UserRoot.class);
     @Autowired
     private UserServices userServices;
 

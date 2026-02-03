@@ -28,11 +28,10 @@ public class SecurityConfig {
                         // Public paths
                         .requestMatchers(
                                 "/",
+                                "/auth/**",
                                 "/terms",
                                 "/privacy",
                                 "/error",
-                                "/signIn",
-                                "/signUp",
                                 "/css/**",
                                 "/js/**",
                                 "/images/**",
@@ -45,7 +44,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
-                        .loginPage("/signIn")
+                        .loginPage("/auth/signIn")
                         .loginProcessingUrl("/process-login")
                         .defaultSuccessUrl("/user/dashboard", true)
                         .failureUrl("/signIn?error=true")

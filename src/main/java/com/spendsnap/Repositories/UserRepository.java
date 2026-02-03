@@ -12,7 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User,Long> {
-    boolean existsByEmail(String email);
+
+    boolean existsByEmail(String email); // use this for otp email verification
+
     Optional<User> findByEmail(String email);
 
     // Count active users
@@ -37,4 +39,10 @@ public interface UserRepository extends JpaRepository<User,Long> {
     @Transactional
     @Query("UPDATE User u SET u.isActive = false WHERE u.id = :id")
     void deactivateUser(Long id);
+
+    // 🔐 Update password using email
+    @Modifying
+    @Transactional
+    @Query("UPDATE User u SET u.password = :password WHERE u.email = :email")
+    int updatePasswordByEmail(String email, String password);
 }

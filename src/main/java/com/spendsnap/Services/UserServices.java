@@ -4,10 +4,10 @@ import com.spendsnap.Entities.User;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface UserServices {
     boolean register(User user);
+
     User getUserObject(Long identity);
 
     Boolean updateUser(User user);
@@ -26,4 +26,10 @@ public interface UserServices {
 
     public Page<User> searchUsers(String q, int page, int size);
     public Page<User> getUsers(int page, int size);
+
+    Boolean isEmailAvailable(String email); //for signUp
+
+    Boolean doesUserExistByEmail(String email); //for Reset password
+
+    void updatePassword(String email,String password);
 }

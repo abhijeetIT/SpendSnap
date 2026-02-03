@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Join SpendSnap - Beautiful Expense Tracking</title>
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
     <link rel="icon" th:href="@{/images/spendsnap-logo.png}" type="image/png">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
     <link rel="stylesheet" th:href="@{/css/signUp.css}">
 </head>
 <body>
@@ -15,7 +16,9 @@
     <a th:href="@{/}" class="back-link">
         <i class="fas fa-arrow-left me-2"></i> Back to Home
     </a>
+
     <div class="form-container">
+        <!-- Header -->
         <div class="form-header">
             <div class="logo-container">
                 <div class="logo-icon">
@@ -25,24 +28,14 @@
             </div>
             <h2>Create Your Account</h2>
         </div>
+
+        <!-- Form Body -->
         <div class="form-content">
-            <!-- Social Login Options -->
-            <div class="social-login">
-                <a href="#" class="social-btn google">
-                    <i class="fab fa-google"></i>
-                    Continue with Google
-                </a>
-            </div>
 
-            <div class="social-divider">
-                <span>or sign up with email</span>
-            </div>
-
-            <form th:action="@{/signUp}" th:object="${user}" method="post" id="signupForm">
-
+            <form th:action="@{/auth/signUp}" th:object="${user}" method="post" id="signupForm">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 
-                <!-- Name -->
+                <!-- ── Name ── -->
                 <div class="form-group">
                     <label for="name" class="form-label">Full Name</label>
                     <div class="input-group">
@@ -52,18 +45,45 @@
                     <div class="invalid-feedback" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
                 </div>
 
-                <!-- Email -->
+                <!-- ── Email + Verify Button + OTP ── -->
                 <div class="form-group">
                     <label for="email" class="form-label">Email Address</label>
                     <div class="input-group">
-                        <input type="email" class="form-control" id="email" th:field="*{email}" required placeholder="your@email.com">
+                        <input type="email" class="form-control" id="email" th:field="*{email}" required placeholder="your@email.com" autocomplete="off">
                         <i class="fas fa-envelope input-icon" id="emailIcon"></i>
                     </div>
                     <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
-                    <div class="valid-feedback" id="emailValid" style="display: none;">Valid email format!</div>
+                    <div class="valid-feedback" id="emailValid" style="display:none;">Valid email format!</div>
+
+                    <!-- Verify Email Button -->
+                    <button type="button" class="verify-email-btn" id="verifyEmailBtn" disabled>
+                        <i class="fas fa-paper-plane btn-icon"></i>
+                        <span class="btn-text">Send OTP</span>
+                        <span class="btn-spinner"></span>
+                    </button>
+
+                    <!-- OTP Section (hidden until OTP sent) -->
+                    <div class="otp-section" id="otpSection">
+                        <div class="otp-label-row">
+                            <label class="form-label">Enter OTP</label>
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <span class="otp-timer" id="otpTimer"></span>
+                                <button type="button" class="otp-resend-btn" id="resendBtn" disabled>Resend</button>
+                            </div>
+                        </div>
+
+                        <div class="otp-boxes" id="otpBoxes">
+                            <input type="text" inputmode="numeric" maxlength="1" class="otp-box" data-index="0" autocomplete="off">
+                            <input type="text" inputmode="numeric" maxlength="1" class="otp-box" data-index="1" autocomplete="off">
+                            <input type="text" inputmode="numeric" maxlength="1" class="otp-box" data-index="2" autocomplete="off">
+                            <input type="text" inputmode="numeric" maxlength="1" class="otp-box" data-index="3" autocomplete="off">
+                        </div>
+
+                        <div class="otp-feedback" id="otpFeedback"></div>
+                    </div>
                 </div>
 
-                <!-- Password -->
+                <!-- ── Password ── -->
                 <div class="form-group">
                     <label for="password" class="form-label">Password</label>
                     <div class="input-group">
@@ -74,21 +94,21 @@
                         <div class="password-strength-bar" id="passwordStrengthBar"></div>
                     </div>
                     <div class="invalid-feedback" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
-                    <div class="form-text">8+ chars with uppercase, lowercase & numbers</div>
+                    <div class="form-text">8+ chars with uppercase, lowercase &amp; numbers</div>
                 </div>
 
-                <!-- Confirm Password -->
+                <!-- ── Confirm Password ── -->
                 <div class="form-group">
                     <label for="confirmPassword" class="form-label">Confirm Password</label>
                     <div class="input-group">
                         <input type="password" class="form-control" id="confirmPassword" required placeholder="Confirm password">
                         <i class="fas fa-eye password-toggle" id="toggleConfirmPassword"></i>
                     </div>
-                    <div class="invalid-feedback" id="confirmPasswordError" style="display: none;">Passwords do not match</div>
-                    <div class="valid-feedback" id="confirmPasswordValid" style="display: none;">Passwords match!</div>
+                    <div class="invalid-feedback" id="confirmPasswordError" style="display:none;">Passwords do not match</div>
+                    <div class="valid-feedback" id="confirmPasswordValid" style="display:none;">Passwords match!</div>
                 </div>
 
-                <!-- Gender -->
+                <!-- ── Gender ── -->
                 <div class="form-group">
                     <label class="form-label">Gender</label>
                     <div class="gender-options">
@@ -103,216 +123,18 @@
                     </div>
                 </div>
 
-                <!-- Submit Button -->
-                <button type="submit" class="btn btn-submit" id="submitBtn">
+                <!-- ── Submit (disabled until OTP verified) ── -->
+                <button type="submit" class="btn btn-submit" id="submitBtn" disabled>
                     <i class="fas fa-user-plus me-2"></i>Create Account
                 </button>
 
                 <div class="login-link">
-                    Already have an account? <a th:href="@{/signIn}">Sign in here</a>
+                    Already have an account? <a th:href="@{/auth/signIn}">Sign in here</a>
                 </div>
             </form>
         </div>
     </div>
 </div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Password visibility toggle
-        const password = document.getElementById('password');
-        const togglePassword = document.getElementById('togglePassword');
-        const confirmPassword = document.getElementById('confirmPassword');
-        const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
-
-        function handlePasswordToggle(input, toggle) {
-            const isPassword = input.type === 'password';
-            input.type = isPassword ? 'text' : 'password';
-            toggle.classList.toggle('fa-eye-slash', isPassword);
-            toggle.classList.toggle('fa-eye', !isPassword);
-        }
-
-        togglePassword.addEventListener('click', function() {
-            handlePasswordToggle(password, togglePassword);
-        });
-
-        toggleConfirmPassword.addEventListener('click', function() {
-            handlePasswordToggle(confirmPassword, toggleConfirmPassword);
-        });
-
-        // Form validation elements
-        const form = document.getElementById('signupForm');
-        const confirmPasswordError = document.getElementById('confirmPasswordError');
-        const confirmPasswordValid = document.getElementById('confirmPasswordValid');
-        const passwordStrengthBar = document.getElementById('passwordStrengthBar');
-        const email = document.getElementById('email');
-        const emailIcon = document.getElementById('emailIcon');
-        const emailValid = document.getElementById('emailValid');
-        const submitBtn = document.getElementById('submitBtn');
-        const name = document.getElementById('name');
-
-        // Password strength checker
-        function checkPasswordStrength(password) {
-            let strength = 0;
-            const criteria = {
-                length: password.length >= 8,
-                lowercase: /[a-z]/.test(password),
-                uppercase: /[A-Z]/.test(password),
-                numbers: /[0-9]/.test(password),
-                special: /[^A-Za-z0-9]/.test(password)
-            };
-
-            Object.values(criteria).forEach(met => {
-                if (met) strength++;
-            });
-
-            return { strength, criteria };
-        }
-
-        function updatePasswordStrength() {
-            const { strength } = checkPasswordStrength(password.value);
-
-            passwordStrengthBar.className = 'password-strength-bar';
-
-            if (password.value) {
-                if (strength <= 2) passwordStrengthBar.classList.add('strength-weak');
-                else if (strength === 3) passwordStrengthBar.classList.add('strength-fair');
-                else if (strength === 4) passwordStrengthBar.classList.add('strength-good');
-                else passwordStrengthBar.classList.add('strength-strong');
-            }
-        }
-
-        password.addEventListener('input', updatePasswordStrength);
-
-        // Password confirmation validation
-        function validatePassword() {
-            if (confirmPassword.value && password.value !== confirmPassword.value) {
-                confirmPassword.classList.add('is-invalid');
-                confirmPassword.classList.remove('is-valid');
-                confirmPasswordError.style.display = 'block';
-                confirmPasswordValid.style.display = 'none';
-                return false;
-            } else if (confirmPassword.value && password.value === confirmPassword.value && password.value.length > 0) {
-                confirmPassword.classList.remove('is-invalid');
-                confirmPassword.classList.add('is-valid');
-                confirmPasswordError.style.display = 'none';
-                confirmPasswordValid.style.display = 'block';
-                return true;
-            } else if (!confirmPassword.value) {
-                confirmPassword.classList.remove('is-invalid', 'is-valid');
-                confirmPasswordError.style.display = 'none';
-                confirmPasswordValid.style.display = 'none';
-            }
-            return true;
-        }
-
-        confirmPassword.addEventListener('input', validatePassword);
-        password.addEventListener('input', validatePassword);
-
-        // Email validation
-        function validateEmail() {
-            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (email.value && emailPattern.test(email.value)) {
-                email.classList.remove('is-invalid');
-                email.classList.add('is-valid');
-                emailIcon.className = 'fas fa-check input-icon';
-                emailIcon.style.color = 'var(--success)';
-                emailValid.style.display = 'block';
-                return true;
-            } else if (email.value) {
-                email.classList.add('is-invalid');
-                email.classList.remove('is-valid');
-                emailIcon.className = 'fas fa-times input-icon';
-                emailIcon.style.color = 'var(--danger)';
-                emailValid.style.display = 'none';
-                return false;
-            } else {
-                email.classList.remove('is-invalid', 'is-valid');
-                emailIcon.className = 'fas fa-envelope input-icon';
-                emailIcon.style.color = 'var(--gray-400)';
-                emailValid.style.display = 'none';
-            }
-            return true;
-        }
-
-        email.addEventListener('input', validateEmail);
-
-        // Name validation
-        function validateName() {
-            if (name.value && name.value.trim().length >= 2) {
-                name.classList.remove('is-invalid');
-                name.classList.add('is-valid');
-                return true;
-            } else if (name.value) {
-                name.classList.add('is-invalid');
-                name.classList.remove('is-valid');
-                return false;
-            } else {
-                name.classList.remove('is-invalid', 'is-valid');
-            }
-            return true;
-        }
-
-        name.addEventListener('input', validateName);
-
-        // Form submission with validation
-        form.addEventListener('submit', function(e) {
-            let isValid = true;
-
-            if (!validatePassword()) isValid = false;
-            if (!validateEmail()) isValid = false;
-            if (!validateName()) isValid = false;
-
-            const { strength } = checkPasswordStrength(password.value);
-            if (strength < 3) {
-                password.classList.add('is-invalid');
-                isValid = false;
-            }
-
-            if (!isValid) {
-                e.preventDefault();
-                return;
-            }
-
-            submitBtn.classList.add('btn-loading');
-            submitBtn.disabled = true;
-        });
-
-        // Add focus animations
-        const allInputs = document.querySelectorAll('.form-control');
-        allInputs.forEach(input => {
-            input.addEventListener('focus', function() {
-                this.parentElement.style.transform = 'translateY(-1px)';
-            });
-
-            input.addEventListener('blur', function() {
-                this.parentElement.style.transform = 'translateY(0)';
-            });
-        });
-
-        // Success animation for valid fields
-        function addSuccessAnimation(element) {
-            element.style.transform = 'scale(1.02)';
-            setTimeout(() => {
-                element.style.transform = 'scale(1)';
-            }, 150);
-        }
-
-        email.addEventListener('input', function() {
-            const wasValid = this.classList.contains('is-valid');
-            const isValid = validateEmail();
-            if (isValid && !wasValid) {
-                addSuccessAnimation(this);
-            }
-        });
-
-        confirmPassword.addEventListener('input', function() {
-            const wasValid = this.classList.contains('is-valid');
-            const isValid = validatePassword();
-            if (isValid && !wasValid) {
-                addSuccessAnimation(this);
-            }
-        });
-    });
-</script>
+<script th:src="@{/js/signUp.js}" defer></script>
 </body>
 </html>
