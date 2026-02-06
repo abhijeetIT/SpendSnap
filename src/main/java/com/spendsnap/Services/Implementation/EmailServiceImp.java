@@ -143,6 +143,7 @@ public class EmailServiceImp implements EmailService {
             helper.addInline("spendsnapLogo", logo);
 
             // 📤 Send email
+            message.setFrom("abhijha4324@gmail.com");
             javaMailSender.send(message);
 
             // 💾 Save OTP (hashed)
