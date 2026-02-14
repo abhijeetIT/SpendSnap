@@ -11,7 +11,7 @@
 ![MySQL](https://img.shields.io/badge/Database-MySQL-blue)
 ![Cloudinary](https://img.shields.io/badge/Cloud-Cloudinary-lightblue)
 
-🌐 **Live Demo:** [SpendSnap on Render](https://extensive-anne-1abhijeet-it19-e08e4293.koyeb.app)
+🌐 **For Live Demo Click on =>:** [SpendSnap](https://spendsnap.koyeb.app/)
 
 ---
 
