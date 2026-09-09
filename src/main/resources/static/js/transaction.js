@@ -123,8 +123,111 @@
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('expenseDate').value = today;
 
+        // Show the receipt scan option (only relevant when adding, not editing)
+        showReceiptScanBox();
+        resetReceiptScanStatus();
+
         // Clear validation
         clearValidationErrors();
+    }
+
+    // ========== AI RECEIPT SCAN ==========
+    function openScanReceiptModal() {
+        openExpenseModal();
+        // Give the modal a moment to render before triggering the file picker
+        setTimeout(() => {
+            const fileInput = document.getElementById('receiptImageInput');
+            if (fileInput) fileInput.click();
+        }, 350);
+    }
+
+    function showReceiptScanBox() {
+        const box = document.getElementById('receiptScanBox');
+        const divider = document.getElementById('scanDivider');
+        if (box) box.style.display = '';
+        if (divider) divider.style.display = '';
+    }
+
+    function hideReceiptScanBox() {
+        const box = document.getElementById('receiptScanBox');
+        const divider = document.getElementById('scanDivider');
+        if (box) box.style.display = 'none';
+        if (divider) divider.style.display = 'none';
+    }
+
+    function resetReceiptScanStatus() {
+        const statusEl = document.getElementById('receiptScanStatus');
+        const labelText = document.getElementById('receiptScanText');
+        const fileInput = document.getElementById('receiptImageInput');
+        if (statusEl) {
+            statusEl.className = 'receipt-scan-status';
+            statusEl.innerHTML = '';
+        }
+        if (labelText) labelText.textContent = 'Snap or upload a bill to auto-fill the details below';
+        if (fileInput) fileInput.value = '';
+    }
+
+    async function scanReceiptImage(inputEl) {
+        const file = inputEl.files && inputEl.files[0];
+        if (!file) return;
+
+        const statusEl = document.getElementById('receiptScanStatus');
+        const labelText = document.getElementById('receiptScanText');
+
+        statusEl.className = 'receipt-scan-status scanning';
+        statusEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Reading your receipt with AI...';
+        if (labelText) labelText.textContent = 'Scanning...';
+
+        const formData = new FormData();
+        formData.append('receiptImage', file);
+
+        try {
+            const response = await fetch('/user/expenses/scan-receipt', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
+                },
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+                statusEl.className = 'receipt-scan-status error';
+                statusEl.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${result.message || 'Could not read the receipt. Please enter details manually.'}`;
+                return;
+            }
+
+            // Pre-fill the form fields for the user to review before saving
+            if (result.amount !== null && result.amount !== undefined) {
+                document.getElementById('expenseAmount').value = result.amount;
+            }
+            if (result.date) {
+                document.getElementById('expenseDate').value = result.date;
+            }
+            if (result.description) {
+                document.getElementById('expenseDescription').value = result.description;
+            }
+
+            const categorySelect = document.getElementById('expenseCategory');
+            if (categorySelect) {
+                categorySelect.value = result.matchedCategoryId ? result.matchedCategoryId : '';
+            }
+
+            statusEl.className = 'receipt-scan-status success';
+            let msg = result.message || 'Receipt scanned! Please review before saving.';
+            if (!result.matchedCategoryId && result.suggestedCategoryName) {
+                msg += ` AI suggested "${result.suggestedCategoryName}" — please pick a category manually.`;
+            }
+            statusEl.innerHTML = `<i class="fas fa-check-circle"></i> ${msg}`;
+
+        } catch (error) {
+            console.error('Receipt scan failed:', error);
+            statusEl.className = 'receipt-scan-status error';
+            statusEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> Scan failed. Check your connection and try again, or enter details manually.';
+        } finally {
+            if (labelText) labelText.textContent = 'Snap or upload a bill to auto-fill the details below';
+        }
     }
 
     function setModalForEdit(expenseId, amount, description, date, categoryId) {
@@ -140,6 +243,9 @@
 
         // Update form action for edit
         document.getElementById('expenseForm').action = `/user/expenses/update/${expenseId}`;
+
+        // Receipt scanning only makes sense when adding a brand new expense
+        hideReceiptScanBox();
 
         // Populate form with existing data
         document.getElementById('expenseId').value = expenseId;

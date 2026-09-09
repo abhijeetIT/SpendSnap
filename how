@@ -1,0 +1,179 @@
+[33mcommit 8086831b6570737c3a4cd40c0ce60104a6d2ff88[m
+Author: abhijeetIT <17333375+abhijeetIT@users.noreply.github.com>
+Date:   Fri Feb 6 08:24:59 2026 +0530
+
+    Brevo api use for email sending
+
+[1mdiff --git a/src/main/java/com/spendsnap/Services/Implementation/EmailServiceImp.java b/src/main/java/com/spendsnap/Services/Implementation/EmailServiceImp.java[m
+[1mindex f9ee8aa..50b6eac 100644[m
+[1m--- a/src/main/java/com/spendsnap/Services/Implementation/EmailServiceImp.java[m
+[1m+++ b/src/main/java/com/spendsnap/Services/Implementation/EmailServiceImp.java[m
+[36m@@ -3,18 +3,18 @@[m [mpackage com.spendsnap.Services.Implementation;[m
+ import com.spendsnap.Entities.EmailOtp;[m
+ import com.spendsnap.Repositories.EmailOtpRepository;[m
+ import com.spendsnap.Services.EmailService;[m
+[31m-import jakarta.mail.internet.MimeMessage;[m
+[32m+[m
+ import org.springframework.beans.factory.annotation.Autowired;[m
+[31m-import org.springframework.core.io.ClassPathResource;[m
+[31m-import org.springframework.mail.javamail.JavaMailSender;[m
+[31m-import org.springframework.mail.javamail.MimeMessageHelper;[m
+[32m+[m[32mimport org.springframework.beans.factory.annotation.Value;[m
+[32m+[m[32mimport org.springframework.http.*;[m
+ import org.springframework.security.crypto.password.PasswordEncoder;[m
+ import org.springframework.stereotype.Service;[m
+ import org.springframework.transaction.annotation.Transactional;[m
+[32m+[m[32mimport org.springframework.web.client.RestTemplate;[m
+ [m
+ import java.security.SecureRandom;[m
+ import java.time.LocalDateTime;[m
+[31m-import java.util.Optional;[m
+[32m+[m[32mimport java.util.*;[m
+ [m
+ @Service[m
+ public class EmailServiceImp implements EmailService {[m
+[36m@@ -25,8 +25,13 @@[m [mpublic class EmailServiceImp implements EmailService {[m
+     @Autowired[m
+     private EmailOtpRepository emailOtpRepository;[m
+ [m
+[31m-    @Autowired[m
+[31m-    private JavaMailSender javaMailSender;[m
+[32m+[m[32m    @Value("${brevo.api.key}")[m
+[32m+[m[32m    private String brevoApiKey;[m
+[32m+[m
+[32m+[m[32m    @Value("${brevo.api.url}")[m
+[32m+[m[32m    private String brevoApiUrl;[m
+[32m+[m
+[32m+[m[32m    private final RestTemplate restTemplate = new RestTemplate();[m
+ [m
+     // 🔐 OTP generator[m
+     public static String OtpGenerate() {[m
+[36m@@ -39,22 +44,15 @@[m [mpublic class EmailServiceImp implements EmailService {[m
+     @Transactional[m
+     @Override[m
+     public Boolean generateAndSendOTP(String userEmail, String purpose) {[m
+[32m+[m
+         try {[m
+[31m-            // 🔁 Remove old OTP if exists[m
+[32m+[m[32m            // 🔁 Remove old OTP[m
+             emailOtpRepository.deleteByEmail(userEmail);[m
+ [m
+             // 🔐 Generate OTP[m
+             String otp = OtpGenerate();[m
+ [m
+[31m-            // 📨 Prepare mail[m
+[31m-            MimeMessage message = javaMailSender.createMimeMessage();[m
+[31m-            MimeMessageHelper helper =[m
+[31m-                    new MimeMessageHelper(message, true, "UTF-8");[m
+[31m-[m
+[31m-            helper.setTo(userEmail);[m
+[31m-            helper.setSubject("SpendSnap | OTP Verification");[m
+[31m-[m
+[31m-            // 🎯 Dynamic message based on purpose[m
+[32m+[m[32m            // 🎯 Purpose text[m
+             String actionText = switch (purpose.toUpperCase()) {[m
+                 case "SIGNUP" -> "complete your Sign Up";[m
+                 case "FORGOT_PASSWORD" -> "reset your password";[m
+[36m@@ -62,7 +60,7 @@[m [mpublic class EmailServiceImp implements EmailService {[m
+                 default -> "verify your action";[m
+             };[m
+ [m
+[31m-            // 💌 Enhanced HTML mail[m
+[32m+[m[32m            // 💌 HTML EMAIL (UNCHANGED)[m
+             String html = """[m
+             <html>[m
+             <body style="margin:0;padding:0;background:#f4f6f8;font-family:Arial,sans-serif;">[m
+[36m@@ -71,14 +69,6 @@[m [mpublic class EmailServiceImp implements EmailService {[m
+                         <td align="center">[m
+                             <table width="480" style="background:#ffffff;padding:30px;border-radius:10px;">[m
+                                 [m
+[31m-                                <tr>[m
+[31m-                                    <td align="center">[m
+[31m-                                        <img src="cid:spendsnapLogo" width="80"/>[m
+[31m-                                    </td>[m
+[31m-                                </tr>[m
+[31m-[m
+[31m-                                <tr><td height="20"></td></tr>[m
+[31m-[m
+                                 <tr>[m
+                                     <td align="center">[m
+                                         <h2 style="color:#222;">OTP Verification</h2>[m
+[36m@@ -133,36 +123,53 @@[m [mpublic class EmailServiceImp implements EmailService {[m
+                 </table>[m
+             </body>[m
+             </html>[m
+[31m-        """.formatted(actionText, otp);[m
+[32m+[m[32m            """.formatted(actionText, otp);[m
+[32m+[m
+[32m+[m[32m            // 🔐 Headers[m
+[32m+[m[32m            HttpHeaders headers = new HttpHeaders();[m
+[32m+[m[32m            headers.setContentType(MediaType.APPLICATION_JSON);[m
+[32m+[m[32m            headers.set("api-key", brevoApiKey);[m
+[32m+[m
+[32m+[m[32m            // 📦 Brevo Request Body (SAFE MAP)[m
+[32m+[m[32m            Map<String, Object> body = new HashMap<>();[m
+ [m
+[31m-            helper.setText(html, true);[m
+[32m+[m[32m            Map<String, String> sender = new HashMap<>();[m
+[32m+[m[32m            sender.put("name", "SpendSnap");[m
+[32m+[m[32m            sender.put("email", "abhijha4324@gmail.com"); // MUST be verified in Brevo[m
+ [m
+[31m-            // 🖼 Logo[m
+[31m-            ClassPathResource logo =[m
+[31m-                    new ClassPathResource("static/images/spendsnap-logo.png");[m
+[31m-            helper.addInline("spendsnapLogo", logo);[m
+[32m+[m[32m            body.put("sender", sender);[m
+ [m
+[31m-            // 📤 Send email[m
+[31m-            message.setFrom("abhijha4324@gmail.com");[m
+[31m-            javaMailSender.send(message);[m
+[32m+[m[32m            Map<String, String> toUser = new HashMap<>();[m
+[32m+[m[32m            toUser.put("email", userEmail);[m
+[32m+[m
+[32m+[m[32m            body.put("to", List.of(toUser));[m
+[32m+[m[32m            body.put("subject", "SpendSnap | OTP Verification");[m
+[32m+[m[32m            body.put("htmlContent", html);[m
+[32m+[m
+[32m+[m[32m            HttpEntity<Map<String, Object>> request =[m
+[32m+[m[32m                    new HttpEntity<>(body, headers);[m
+[32m+[m
+[32m+[m[32m            // 📤 Send email via Brevo API[m
+[32m+[m[32m            restTemplate.postForEntity([m
+[32m+[m[32m                    brevoApiUrl,[m
+[32m+[m[32m                    request,[m
+[32m+[m[32m                    String.class[m
+[32m+[m[32m            );[m
+ [m
+             // 💾 Save OTP (hashed)[m
+             EmailOtp emailOtp = new EmailOtp();[m
+             emailOtp.setEmail(userEmail);[m
+             emailOtp.setOtp(passwordEncoder.encode(otp));[m
+             emailOtp.setExpiresAt(LocalDateTime.now().plusMinutes(2));[m
+[31m-[m
+             emailOtpRepository.save(emailOtp);[m
+ [m
+             return true;[m
+ [m
+         } catch (Exception e) {[m
+[31m-            e.printStackTrace();[m
+             return false;[m
+         }[m
+     }[m
+ [m
+[31m-[m
+     // ================= VERIFY OTP =================[m
+     @Transactional[m
+     @Override[m
+[36m@@ -171,26 +178,21 @@[m [mpublic class EmailServiceImp implements EmailService {[m
+         Optional<EmailOtp> optionalOtp =[m
+                 emailOtpRepository.findByEmail(userEmail);[m
+ [m
+[31m-        // ❌ Not found[m
+         if (optionalOtp.isEmpty()) {[m
+             return false;[m
+         }[m
+ [m
+         EmailOtp emailOtp = optionalOtp.get();[m
+ [m
+[31m-        // ❌ Expired[m
+         if (emailOtp.getExpiresAt().is

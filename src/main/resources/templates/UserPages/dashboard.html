@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard | SpendSnap</title>
     <link rel="icon" th:href="@{/images/spendsnap-logo1.png}" type="image/png">
@@ -527,6 +528,99 @@
             transform: scale(1.1);
         }
 
+        /* Scan Receipt Button (secondary FAB, sits above Add button) */
+        .scan-btn {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .scan-btn:hover {
+            background: var(--primary-dark);
+            transform: scale(1.1);
+        }
+
+        /* AI Receipt Scan Box (inside Add Expense modal) */
+        .receipt-scan-box {
+            border: 2px dashed var(--primary);
+            background: rgba(67, 97, 238, 0.05);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 16px;
+            text-align: center;
+            transition: background 0.2s ease;
+        }
+
+        .receipt-scan-box:hover {
+            background: rgba(67, 97, 238, 0.09);
+        }
+
+        .receipt-scan-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            color: var(--primary);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .receipt-scan-label i {
+            font-size: 1.6rem;
+        }
+
+        .receipt-scan-status {
+            margin-top: 10px;
+            font-size: 0.85rem;
+            min-height: 1em;
+        }
+
+        .receipt-scan-status.scanning {
+            color: var(--primary);
+        }
+
+        .receipt-scan-status.success {
+            color: var(--success);
+        }
+
+        .receipt-scan-status.error {
+            color: var(--danger);
+        }
+
+        .scan-divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: var(--gray-600);
+            font-size: 0.8rem;
+            margin: 4px 0 18px;
+        }
+
+        .scan-divider::before,
+        .scan-divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .scan-divider span {
+            padding: 0 10px;
+        }
+
         /* Modal Styles */
         .modal {
             display: none;
@@ -737,6 +831,14 @@
                 width: 50px;
                 height: 50px;
                 font-size: 1.2rem;
+            }
+
+            .scan-btn {
+                bottom: 80px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+                font-size: 1.1rem;
             }
 
             .dashboard-category .category-icon-container,
@@ -974,6 +1076,11 @@
             </table>
         </div>
 
+        <!-- Scan Receipt Button -->
+        <button class="scan-btn" onclick="openScanReceiptModal()" title="Scan a bill with AI">
+            <i class="fas fa-camera"></i>
+        </button>
+
         <!-- Add Transaction Button -->
         <button class="add-btn" onclick="openExpenseModal()">
             <i class="fas fa-plus"></i>
@@ -992,6 +1099,18 @@
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
             <input type="hidden" th:field="*{id}"/>
             <input type="hidden" th:field="*{user.id}"/>
+
+            <!-- AI Receipt Scan -->
+            <div class="receipt-scan-box" id="receiptScanBox">
+                <label for="receiptImageInput" class="receipt-scan-label">
+                    <i class="fas fa-camera"></i>
+                    <span id="receiptScanText">Snap or upload a bill to auto-fill the details below</span>
+                </label>
+                <input type="file" id="receiptImageInput" accept="image/*" capture="environment"
+                       onchange="scanReceiptImage(this)" hidden>
+                <div id="receiptScanStatus" class="receipt-scan-status"></div>
+            </div>
+            <div class="scan-divider" id="scanDivider"><span>or enter manually</span></div>
 
             <div class="form-group">
                 <label for="expenseAmount" class="form-label">Amount</label>
@@ -1053,11 +1172,97 @@
         const expenseDateInput = document.getElementById('expenseDate');
         expenseDateInput.max = today;
         expenseDateInput.value = today; // Set default to today
+
+        resetReceiptScanStatus();
     }
 
     function closeExpenseModal() {
         document.getElementById('expenseModal').style.display = 'none';
         clearValidationErrors('expenseForm');
+    }
+
+    // ========== AI RECEIPT SCAN ==========
+    function openScanReceiptModal() {
+        openExpenseModal();
+        setTimeout(() => {
+            const fileInput = document.getElementById('receiptImageInput');
+            if (fileInput) fileInput.click();
+        }, 350);
+    }
+
+    function resetReceiptScanStatus() {
+        const statusEl = document.getElementById('receiptScanStatus');
+        const labelText = document.getElementById('receiptScanText');
+        const fileInput = document.getElementById('receiptImageInput');
+        if (statusEl) {
+            statusEl.className = 'receipt-scan-status';
+            statusEl.innerHTML = '';
+        }
+        if (labelText) labelText.textContent = 'Snap or upload a bill to auto-fill the details below';
+        if (fileInput) fileInput.value = '';
+    }
+
+    async function scanReceiptImage(inputEl) {
+        const file = inputEl.files && inputEl.files[0];
+        if (!file) return;
+
+        const statusEl = document.getElementById('receiptScanStatus');
+        const labelText = document.getElementById('receiptScanText');
+
+        statusEl.className = 'receipt-scan-status scanning';
+        statusEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Reading your receipt with AI...';
+        if (labelText) labelText.textContent = 'Scanning...';
+
+        const formData = new FormData();
+        formData.append('receiptImage', file);
+
+        try {
+            const response = await fetch('/user/expenses/scan-receipt', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
+                },
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+                statusEl.className = 'receipt-scan-status error';
+                statusEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> ' +
+                    (result.message || 'Could not read the receipt. Please enter details manually.');
+                return;
+            }
+
+            if (result.amount !== null && result.amount !== undefined) {
+                document.getElementById('expenseAmount').value = result.amount;
+            }
+            if (result.date) {
+                document.getElementById('expenseDate').value = result.date;
+            }
+            if (result.description) {
+                document.getElementById('expenseDescription').value = result.description;
+            }
+
+            const categorySelect = document.getElementById('expenseCategory');
+            if (categorySelect) {
+                categorySelect.value = result.matchedCategoryId ? result.matchedCategoryId : '';
+            }
+
+            statusEl.className = 'receipt-scan-status success';
+            let msg = result.message || 'Receipt scanned! Please review before saving.';
+            if (!result.matchedCategoryId && result.suggestedCategoryName) {
+                msg += ' AI suggested "' + result.suggestedCategoryName + '" — please pick a category manually.';
+            }
+            statusEl.innerHTML = '<i class="fas fa-check-circle"></i> ' + msg;
+
+        } catch (error) {
+            console.error('Receipt scan failed:', error);
+            statusEl.className = 'receipt-scan-status error';
+            statusEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> Scan failed. Check your connection and try again, or enter details manually.';
+        } finally {
+            if (labelText) labelText.textContent = 'Snap or upload a bill to auto-fill the details below';
+        }
     }
 
     // Close modal when clicking outside

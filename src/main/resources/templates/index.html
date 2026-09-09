@@ -171,25 +171,26 @@
         <div class="container">
             <div class="hero-content">
                 <div class="hero-text animate-fade-in">
-                    <div class="hero-badge">
-                        <i class="fas fa-star"></i>
-                        <span>Simple & Effective</span>
+                    <div class="hero-badge hero-badge-ai">
+                        <i class="fas fa-wand-magic-sparkles"></i>
+                        <span>New: AI-Powered Receipt Scanning</span>
                     </div>
                     <h1 class="hero-title">
                         Track Your Expenses the Smart Way
                     </h1>
                     <p class="hero-description">
-                        SpendSnap helps you easily record and categorize your daily expenses.
-                        Get clear insights into your spending habits with our intuitive interface and powerful analytics.
+                        SpendSnap now reads your bills for you. Just snap a photo of a receipt and our AI
+                        instantly fills in the amount, date, and category — no more typing every expense by hand.
+                        Prefer typing? Manual entry is still there whenever you want it.
                     </p>
                     <div class="hero-buttons">
                         <a th:href="@{/auth/signUp}" class="btn btn-primary">
                             <i class="fas fa-rocket"></i>
                             Get Started - It's Free
                         </a>
-                        <a href="#features" class="btn btn-secondary">
-                            <i class="fas fa-play"></i>
-                            See How It Works
+                        <a href="#ai-scan" class="btn btn-secondary">
+                            <i class="fas fa-camera"></i>
+                            See AI Scan in Action
                         </a>
                     </div>
                 </div>
@@ -223,19 +224,54 @@
                             </div>
                             <div class="expense-amount">-₹2.75</div>
                         </div>
-                        <div class="expense-item">
+                        <div class="expense-item expense-item-ai">
                             <div style="display: flex; align-items: center;">
                                 <div class="expense-category" style="background: linear-gradient(135deg, #7c3aed, #6d28d9);">
                                     <i class="fas fa-shopping-bag"></i>
                                 </div>
                                 <div class="expense-details">
-                                    <div class="expense-name">Groceries</div>
+                                    <div class="expense-name">
+                                        Groceries
+                                        <span class="ai-tag"><i class="fas fa-robot"></i> AI Scanned</span>
+                                    </div>
                                     <div class="expense-date">Yesterday • Supermarket</div>
                                 </div>
                             </div>
                             <div class="expense-amount">-₹45.20</div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI Scan Showcase -->
+    <section id="ai-scan" class="ai-showcase">
+        <div class="container">
+            <div class="section-header">
+                <h2><i class="fas fa-robot"></i> Stop Typing. Start Snapping.</h2>
+                <p>SpendSnap's built-in AI reads your bills so you don't have to enter anything by hand.</p>
+            </div>
+            <div class="ai-steps">
+                <div class="ai-step">
+                    <div class="ai-step-number">1</div>
+                    <i class="fas fa-camera ai-step-icon"></i>
+                    <h3>Snap a Photo</h3>
+                    <p>Take a picture of any bill or receipt, or upload one from your gallery.</p>
+                </div>
+                <i class="fas fa-arrow-right ai-step-arrow"></i>
+                <div class="ai-step">
+                    <div class="ai-step-number">2</div>
+                    <i class="fas fa-brain ai-step-icon"></i>
+                    <h3>AI Reads It</h3>
+                    <p>Our AI extracts the amount, date, merchant, and suggests the right category automatically.</p>
+                </div>
+                <i class="fas fa-arrow-right ai-step-arrow"></i>
+                <div class="ai-step">
+                    <div class="ai-step-number">3</div>
+                    <i class="fas fa-check-circle ai-step-icon"></i>
+                    <h3>Review &amp; Save</h3>
+                    <p>Everything's pre-filled for you — just double-check and tap save. That's it.</p>
                 </div>
             </div>
         </div>
@@ -273,6 +309,14 @@
                 <p>Everything you need to manage your daily expenses without complications</p>
             </div>
             <div class="features-grid">
+                <div class="feature-card feature-card-ai">
+                    <div class="feature-new-ribbon">NEW</div>
+                    <div class="feature-icon feature-icon-ai">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h3>AI Receipt Scanning</h3>
+                    <p>Snap a photo of any bill and let AI do the data entry — amount, date, and category, all auto-filled in seconds. No manual typing needed.</p>
+                </div>
                 <div class="feature-card">
                     <div class="feature-icon">
                         <i class="fas fa-plus-circle"></i>

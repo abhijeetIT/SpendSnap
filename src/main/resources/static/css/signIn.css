@@ -64,6 +64,33 @@
             z-index: 1;
         }
 
+        /* Floating Home button */
+        .home-fab {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 10;
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.18);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            font-size: 1.1rem;
+            text-decoration: none;
+            transition: all 0.25s ease;
+        }
+
+        .home-fab:hover {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+            transform: translateY(-2px);
+        }
+
         .login-container {
             max-width: 420px;
             margin: 0 auto;

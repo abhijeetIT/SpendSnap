@@ -2,6 +2,7 @@ package com.spendsnap.Controllers;
 
 import com.spendsnap.DTO.CategoryDTO;
 import com.spendsnap.DTO.ExpenseDTO;
+import com.spendsnap.DTO.ReceiptScanResponse;
 import com.spendsnap.Entities.Category;
 import com.spendsnap.Entities.Expense;
 import com.spendsnap.Entities.User;
@@ -15,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.*;
@@ -39,6 +41,9 @@ public class UserRoot {
 
     @Autowired
     private categoryService categoryService;
+
+    @Autowired
+    private ReceiptScanService receiptScanService;
 
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
@@ -150,6 +155,25 @@ public class UserRoot {
             redirectAttributes.addFlashAttribute("alertMessage", "Failed to add expense");
         }
         return "redirect:/user/transactions";
+    }
+
+    // ================= AI RECEIPT SCAN =================
+    // Scans an uploaded bill/receipt image and returns suggested expense
+    // fields (amount, date, description, category). Nothing is saved here —
+    // the frontend pre-fills the existing "Add Expense" form so the user can
+    // review everything before submitting it via the normal /expenses/add flow.
+    @PostMapping("/expenses/scan-receipt")
+    @ResponseBody
+    public ResponseEntity<ReceiptScanResponse> scanReceipt(
+            @RequestParam("receiptImage") MultipartFile receiptImage) {
+
+        Long userId = userUtil.getLoggedInUserId();
+        ReceiptScanResponse response = receiptScanService.scanReceipt(receiptImage, userId);
+
+        if (!response.isSuccess()) {
+            return ResponseEntity.badRequest().body(response);
+        }
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("expenses/update/{id}")
