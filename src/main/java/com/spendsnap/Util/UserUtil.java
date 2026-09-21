@@ -1,7 +1,7 @@
-package com.spendsnap.Util;
+package com.spendsnap.util;
 
-import com.spendsnap.Entities.User;
-import com.spendsnap.Repositories.UserRepository;
+import com.spendsnap.entity.User;
+import com.spendsnap.repository.UserRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;

@@ -1,4 +1,4 @@
-package com.spendsnap.DTO;
+package com.spendsnap.dto;
 
 /**
  * Response returned to the frontend after an uploaded receipt/bill image

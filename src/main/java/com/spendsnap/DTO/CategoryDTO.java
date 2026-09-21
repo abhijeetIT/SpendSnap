@@ -1,4 +1,4 @@
-package com.spendsnap.DTO;
+package com.spendsnap.dto;
 
 public class CategoryDTO {
     private Long id;
